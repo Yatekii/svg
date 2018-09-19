@@ -1,0 +1,5 @@
+use nalgebra;
+
+pub type Point = nalgebra::geometry::Point2<f32>;
+pub type Vector = nalgebra::base::Vector2<f32>;
+pub type Transform = nalgebra::geometry::Transform2<f32>;

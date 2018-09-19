@@ -1,0 +1,8 @@
+[package]
+name = "svg"
+version = "0.1.0"
+authors = ["Noah Huesser <admin@yatekii.ch>"]
+
+[dependencies]
+indextree = "2.1.0"
+nalgebra = "*"
