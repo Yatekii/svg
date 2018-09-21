@@ -40,7 +40,7 @@ mod tests {
 
         // Add some new nodes to the arena
         let a = arena.new_node(ElementType::Group(element::Group { transform: Transform::identity() }));
-        let b = arena.new_node(ElementType::Circle(element::Circle { origin: Point::origin(), radius: 1.0 }));
+        let b = arena.new_node(ElementType::Circle(element::Circle::new()));
 
         a.append(b, arena);
 

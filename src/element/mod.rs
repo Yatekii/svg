@@ -3,6 +3,9 @@ pub mod line;
 pub mod path;
 pub mod rect;
 pub mod group;
+pub mod transform_data;
+pub mod vertex_data;
+pub mod color;
 
 pub use self::circle::Circle;
 pub use self::line::Line;
@@ -21,8 +24,6 @@ pub enum ElementType {
 }
 
 pub trait Element {
-    fn is_vbo_dirty() -> bool;
-    fn is_transform_dirty() -> bool;
     fn get_vbo() -> Vec<i32>;
     fn get_tranform() -> Transform;
 }
