@@ -3,9 +3,6 @@ pub mod line;
 pub mod path;
 pub mod rect;
 pub mod group;
-pub mod transform_data;
-pub mod vertex_data;
-pub mod color;
 
 pub use self::circle::Circle;
 pub use self::line::Line;

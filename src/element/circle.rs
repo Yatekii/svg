@@ -1,8 +1,8 @@
 use geometry::{ Point, Transform };
 use super::Element;
 
-use super::transform_data::TransformData;
-use super::vertex_data::VertexData;
+use transform_data::TransformData;
+use vertex_data::VertexData;
 
 pub struct Circle {
     // Top left
@@ -25,15 +25,5 @@ impl Circle {
             transform_data: TransformData::new(),
             vertex_data: VertexData::new()
         }
-    }
-}
-
-impl Element for Circle {
-    fn get_vbo() -> Vec<i32> {
-        vec![]
-    }
-
-    fn get_tranform() -> Transform {
-        Transform::identity()
     }
 }
