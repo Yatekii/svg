@@ -1,3 +1,5 @@
+use transform_data::TransformData;
+use vertex_data::VertexData;
 use geometry::{ Point, Vector };
 
 pub struct Rect {
@@ -5,4 +7,8 @@ pub struct Rect {
     origin: Point,
     // Width, Height
     dimensions: Vector,
+    // TransformData
+    pub transform_data: TransformData,
+    // VertexData
+    pub vertex_data: VertexData,
 }

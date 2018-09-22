@@ -11,6 +11,7 @@ pub struct Circle {
     pub radius: f32,
     // TransformData
     pub transform_data: TransformData,
+    // VertexData
     pub vertex_data: VertexData,
     
 }
