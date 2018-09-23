@@ -1,3 +1,5 @@
+use color::Color;
+use element::ElementUpdate;
 use geometry::{ Point, Transform };
 use super::Element;
 
@@ -26,5 +28,33 @@ impl Circle {
             transform_data: TransformData::new(),
             vertex_data: VertexData::new()
         }
+    }
+}
+
+// impl Element for Circle {
+//     fn get_vbo(&self) -> &Vec<i32> {
+//         &vec![]
+//     }
+
+//     fn get_local_tranform(&self) -> &Transform {
+//         &self.transform_data.local_transform
+//     }
+
+//     fn get_group_tranform(&self) -> &Transform {
+//         &self.transform_data.group_transform
+//     }
+// }
+
+impl ElementUpdate for Circle {
+    fn set_group_transform(&mut self, transform: &Transform) {
+        self.transform_data.group_transform = transform.clone();
+    }
+
+    fn set_local_transform(&mut self, transform: &Transform) {
+        self.transform_data.local_transform = transform.clone();
+    }
+
+    fn set_color(&mut self, color: &Color) {
+        self.vertex_data.color = color.clone();
     }
 }

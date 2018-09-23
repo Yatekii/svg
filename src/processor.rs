@@ -1,3 +1,6 @@
+use element::circle::Circle;
+use element::Element;
+use element::ElementUpdate;
 use attribute_stack::*;
 use common::*;
 use element::ElementType;
@@ -5,9 +8,9 @@ use element::ElementType;
 
 pub fn process_tree(mut attribute_stack: AttributeStack, arena: &mut Arena, node_id: NodeId) {
     // We never access a node with an ID that does not exist.
-    let node = arena.get(node_id).unwrap();
-    match &node.data {
-        ElementType::Circle(_circle) => update_node(arena, node_id, &attribute_stack),
+    let node = arena.get_mut(node_id).unwrap();
+    match &mut node.data {
+        ElementType::Circle(circle) => update_node(circle, &attribute_stack),
         ElementType::Line(_line) => println!("Line"),
         ElementType::Path(_path) => println!("Path"),
         ElementType::Rect(_rect) => println!("Rect"),
@@ -21,22 +24,7 @@ pub fn process_tree(mut attribute_stack: AttributeStack, arena: &mut Arena, node
     }
 }
 
-pub fn update_node(arena: &mut Arena, node_id: NodeId, attribute_stack: &AttributeStack) {
-    arena.get_mut(node_id).map(|node| {
-        match &mut node.data {
-            ElementType::Circle(circle) => {
-                circle.transform_data.group_transform = attribute_stack.transform.clone();
-            },
-            ElementType::Line(line) => {
-                line.transform_data.group_transform = attribute_stack.transform.clone();
-            },
-            ElementType::Path(path) => {
-                path.transform_data.group_transform = attribute_stack.transform.clone();
-            },
-            ElementType::Rect(rect) => {
-                rect.transform_data.group_transform = attribute_stack.transform.clone();
-            },
-            ElementType::Group(_group) => (),
-        }
-    });
+pub fn update_node<T>(element: &mut T, attribute_stack: &AttributeStack)
+    where T: ElementUpdate  {
+    element.set_group_transform(&attribute_stack.transform);
 }
