@@ -3,14 +3,14 @@ use color::*;
 
 #[derive(Clone)]
 pub struct AttributeStack {
-    pub transform: Transform,
+    pub transform: Matrix,
     pub color: Color,
 }
 
 impl AttributeStack {
     pub fn new() -> AttributeStack {
         AttributeStack {
-            transform: Transform::identity(),
+            transform: Matrix::identity(),
             color: Color::black(),
         }
     }

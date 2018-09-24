@@ -1,15 +1,15 @@
 use geometry::*;
 
 pub struct TransformData {
-    pub local_transform: Transform,
-    pub group_transform: Transform,
+    pub local_transform: Matrix,
+    pub group_transform: Matrix,
 }
 
 impl TransformData {
     pub fn new() -> TransformData {
         TransformData {
-            local_transform: Transform::identity(),
-            group_transform: Transform::identity(),
+            local_transform: Matrix::identity(),
+            group_transform: Matrix::identity(),
         }
     }
 }

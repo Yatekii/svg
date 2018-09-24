@@ -1,5 +1,5 @@
 use geometry;
 
 pub struct Group {
-    pub transform: geometry::Transform,
+    pub transform: geometry::Matrix,
 }

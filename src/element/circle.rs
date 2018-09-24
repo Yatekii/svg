@@ -1,6 +1,6 @@
 use color::Color;
 use element::ElementUpdate;
-use geometry::{ Point, Transform };
+use geometry::{ Point, Matrix };
 use super::Element;
 
 use transform_data::TransformData;
@@ -46,11 +46,11 @@ impl Circle {
 // }
 
 impl ElementUpdate for Circle {
-    fn set_group_transform(&mut self, transform: &Transform) {
+    fn set_group_transform(&mut self, transform: &Matrix) {
         self.transform_data.group_transform = transform.clone();
     }
 
-    fn set_local_transform(&mut self, transform: &Transform) {
+    fn set_local_transform(&mut self, transform: &Matrix) {
         self.transform_data.local_transform = transform.clone();
     }
 

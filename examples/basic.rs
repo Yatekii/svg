@@ -12,7 +12,7 @@ fn main() {
     let arena = &mut Arena::new();
 
     // Add some new nodes to the arena
-    let a = arena.new_node(ElementType::Group(element::Group { transform: Transform::from_matrix_unchecked(Matrix::new_scaling(3.0)) }));
+    let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     let b = arena.new_node(ElementType::Circle(element::Circle::new()));
 
     a.append(b, arena);
