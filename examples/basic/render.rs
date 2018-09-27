@@ -19,13 +19,11 @@ gfx_defines!{
 
     // a 2x3 matrix (last two members of data1 unused).
     constant Transform {
-        data: [[f32; 3]; 3] = "data",
+        data: [[f32; 4]; 4] = "data",
     }
 
-    constant Primitive {
-        local_transform: u32 = "local_transform",
-        group_transform: u32 = "group_transform",
-        color: u32 = "color",
+    constant Color {
+        data: [f32; 4] = "data",
     }
 
     constant Globals {
@@ -38,7 +36,7 @@ gfx_defines!{
         vbo: gfx::VertexBuffer<Vertex> = (),
         out_color: gfx::RenderTarget<ColorFormat> = "out_color",
         globals: gfx::ConstantBuffer<Globals> = "Globals",
-        primitives: gfx::ConstantBuffer<Primitive> = "u_primitives",
+        colors: gfx::ConstantBuffer<Color> = "u_colors",
         transforms: gfx::ConstantBuffer<Transform> = "u_transforms",
     }
 }
@@ -66,17 +64,17 @@ impl tessellation::VertexConstructor<tessellation::FillVertex, Vertex> for Verte
 
 impl TransformPrimitive for Vertex {
     fn set_local_transform_index(&mut self, index: u32) {
-        self.set_local_transform_index(index);
+        self.local_transform_index = index;
     }
 
     fn set_group_transform_index(&mut self, index: u32) {
-        self.set_group_transform_index(index);
+        self.group_transform_index = index;
     }
 }
 
 impl ColorPrimitive for Vertex{
     fn set_color_index(&mut self, index: u32) {
-        self.set_color_index(index)
+        self.color_index = index;
     }
 }
 
@@ -124,23 +122,15 @@ pub static VERTEX_SHADER: &'static str = "
         float u_aspect_ratio;
     };
 
-    uniform VehicleAttributes {
-        vec4 transform_data0;
-        vec4 transform_data1;
-        vec2 u_position;
-    };
-
-    struct Primitive {
-        uint transform;
-        uint color;
+    struct Color {
+        vec4 data;
     };
 
     struct Transform {
-        vec4 data0;
-        vec4 data1;
+        mat4 data;
     };
 
-    uniform u_primitives { Primitive primitives[512]; };
+    uniform u_colors { Color colors[512]; };
     uniform u_transforms { Transform transforms[512]; };
 
     in vec2 a_position;
@@ -149,34 +139,15 @@ pub static VERTEX_SHADER: &'static str = "
     out vec4 v_color;
 
     void main() {
-        Primitive prim = primitives[a_prim_id];
+        mat4 transform = transforms[a_prim_id].data;
+        vec4 color = colors[a_prim_id].data;
 
-        Transform t = transforms[prim.transform];
-        mat3 transform = mat3(
-            t.data0.x, t.data0.y, 0.0,
-            t.data0.z, t.data0.w, 0.0,
-            t.data1.x, t.data1.y, 1.0
-        );
-
-        mat3 object_transform = mat3(
-            transform_data0.x, transform_data0.y, 0.0,
-            transform_data0.z, transform_data0.w, 0.0,
-            transform_data1.x, transform_data1.y, 1.0
-        );
-
-        vec2 pos = (transform * object_transform * vec3(a_position, 1.0)).xy + u_position;
+        vec2 pos = (transform * vec4(a_position, 1.0, 1.0)).xy;
         gl_Position = vec4((pos.xy + u_pan) * u_zoom, 0.0, 1.0);
         gl_Position.y *= -1.0;
         gl_Position.x /= u_aspect_ratio;
 
-        uint mask = 0x000000FFu;
-        uint color = prim.color;
-        v_color = vec4(
-            float((color >> 24) & mask),
-            float((color >> 16) & mask),
-            float((color >>  8) & mask),
-            float(color & mask)
-        ) / 255.0;
+        v_color = color;
     }
 ";
 

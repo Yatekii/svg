@@ -1,3 +1,4 @@
+#![feature(duration_as_u128)]
 #[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;
@@ -79,8 +80,8 @@ fn main() {
 
     // Create a new GL context.
     let context = glutin::ContextBuilder::new()
-        .with_multisampling(8)
-        .with_vsync(true);
+        .with_multisampling(8);
+        //.with_vsync(true);
 
     // Create all the necessary context with the window.
     let (window, mut device, mut factory, mut main_fbo, mut main_depth) =
@@ -114,17 +115,18 @@ fn main() {
 
     let mut cmd_queue: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
-    //let globals = factory.create_constant_buffer(1);
-    //let vehicle_attributes = factory.create_constant_buffer(1);
+    let globals = factory.create_constant_buffer::<render::Globals>(1);
+    let transforms = factory.create_constant_buffer::<render::Transform>(1);
+    let colors = factory.create_constant_buffer::<render::Color>(1);
 
     loop {
-        let t = Instant::now();
+        //let t = Instant::now();
 
         gfx_window_glutin::update_views(&window, &mut main_fbo, &mut main_depth);
 
         cmd_queue.clear(&main_fbo.clone(), [0.15, 0.15, 0.16, 1.0]);
 
-        //cmd_queue.update_constant_buffer(&globals, &scene.into());
+        cmd_queue.update_constant_buffer(&globals, &scene.into());
 
         // TODO: Draw
         // vehicle_instances = vehicle_instances
