@@ -1,5 +1,6 @@
 use geometry::*;
 use super::color::Color;
+use primitive::*;
 
 use gfx;
 use lyon::tessellation;
@@ -7,15 +8,14 @@ use transform_data::TransformData;
 
 pub type ColorFormat = gfx::format::Rgba8;
 
-pub struct Buffers<V> {
+pub struct Buffers<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub vbo: Vec<V>,
     pub ibo: Vec<u32>,
-    pub pbo: Vec<PrimitiveIndex>,
     pub tbo: Vec<Matrix>,
     pub cbo: Vec<Color>,
 }
 
-pub struct VertexData<V> {
+pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub vbo: Vec<V>,
     pub ibo: Vec<u32>,
     pub transform_data: TransformData,
@@ -28,7 +28,7 @@ pub struct PrimitiveIndex {
     pub color: u32
 }
 
-impl<V> VertexData<V> {
+impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
     pub fn new() -> VertexData<V> {
         VertexData {
             vbo: vec![],
@@ -37,16 +37,16 @@ impl<V> VertexData<V> {
             color: Color::black(),
         }
     }
-    pub fn apply_to<V>(&self, buffers: &mut Buffers<V>) {
+    pub fn apply_to(&self, buffers: &mut Buffers<V>) {
         let len = buffers.vbo.len() as u32;
         let len_transform = buffers.tbo.len() as u32;
-        buffers.vbo.extend(self.vbo.iter().cloned());
+        buffers.vbo.extend(self.vbo.clone().drain(..).map(|mut v| {
+            v.set_local_transform_index(len_transform);
+            v.set_group_transform_index(len_transform + 1);
+            v.set_color_index(buffers.cbo.len() as u32);
+            v
+        }).collect::<Vec<_>>());
         buffers.ibo.extend(&self.ibo.iter().map(|x| x + len).collect::<Vec<_>>());
-        buffers.pbo.push(PrimitiveIndex {
-            local_transform_id: len_transform,
-            group_transform_id: len_transform + 1,
-            color: buffers.cbo.len() as u32,
-        });
         buffers.tbo.push(self.transform_data.local_transform);
         buffers.tbo.push(self.transform_data.group_transform);
         buffers.cbo.push(self.color);

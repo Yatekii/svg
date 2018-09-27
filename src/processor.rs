@@ -5,9 +5,10 @@ use attribute_stack::*;
 use common::*;
 use element::ElementType;
 use vertex_data::Buffers;
+use primitive::*;
 
 
-pub fn process_tree(mut attribute_stack: AttributeStack, arena: &mut Arena, node_id: NodeId) {
+pub fn process_tree<V: TransformPrimitive + ColorPrimitive + Clone>(mut attribute_stack: AttributeStack, arena: &mut Arena<V>, node_id: NodeId) {
     // We never access a node with an ID that does not exist.
     let node = arena.get_mut(node_id).unwrap();
     match &mut node.data {
@@ -30,7 +31,7 @@ pub fn update_node<T>(element: &mut T, attribute_stack: &AttributeStack)
     element.set_group_transform(&attribute_stack.transform);
 }
 
-pub fn generate_buffer(arena: &mut Arena, node_id: NodeId, buffers: &mut Buffers) {
+pub fn generate_buffer<V: TransformPrimitive + ColorPrimitive + Clone>(arena: &mut Arena<V>, node_id: NodeId, buffers: &mut Buffers<V>) {
     // We never access a node with an ID that does not exist.
     let node = arena.get(node_id).unwrap();
     match &node.data {
@@ -45,7 +46,7 @@ pub fn generate_buffer(arena: &mut Arena, node_id: NodeId, buffers: &mut Buffers
     }
 }
 
-pub fn add_to_buffer<T>(element: &mut T, buffers: &mut Buffers)
+pub fn add_to_buffer<T, V: TransformPrimitive + ColorPrimitive + Clone>(element: &mut T, buffers: &mut Buffers<V>)
     where T: ElementUpdate {
     
 }

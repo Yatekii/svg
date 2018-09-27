@@ -20,6 +20,7 @@ pub mod vertex_data;
 pub mod color;
 pub mod attribute_stack;
 pub mod processor;
+pub mod primitive;
 
 #[cfg(test)]
 mod tests {

@@ -1,12 +1,13 @@
 use color::Color;
 use element::ElementUpdate;
 use geometry::{ Point, Matrix };
+use primitive::*;
 use super::Element;
 
 use transform_data::TransformData;
 use vertex_data::VertexData;
 
-pub struct Circle {
+pub struct Circle<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
     pub origin: Point,
     // Radius
@@ -14,19 +15,19 @@ pub struct Circle {
     // TransformData
     pub transform_data: TransformData,
     // VertexData
-    pub vertex_data: VertexData,
+    pub vertex_data: VertexData<V>,
     
 }
 
-impl Circle {
-    pub fn new() -> Circle {
+impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
+    pub fn new() -> Circle<V> {
         // TODO: tesselate circle!
 
         Circle {
             origin: Point::origin(),
             radius: 1.0,
             transform_data: TransformData::new(),
-            vertex_data: VertexData::new()
+            vertex_data: VertexData::<V>::new()
         }
     }
 }
@@ -45,7 +46,7 @@ impl Circle {
 //     }
 // }
 
-impl ElementUpdate for Circle {
+impl<V: TransformPrimitive + ColorPrimitive + Clone> ElementUpdate for Circle<V> {
     fn set_group_transform(&mut self, transform: &Matrix) {
         self.transform_data.group_transform = transform.clone();
     }

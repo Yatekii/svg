@@ -12,12 +12,13 @@ pub use self::group::Group;
 
 use geometry::Matrix;
 use color::Color;
+use primitive::*;
 
-pub enum ElementType {
-    Circle(circle::Circle),
-    Line(line::Line),
-    Path(path::Path),
-    Rect(rect::Rect),
+pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
+    Circle(circle::Circle<V>),
+    Line(line::Line<V>),
+    Path(path::Path<V>),
+    Rect(rect::Rect<V>),
     Group(group::Group),
 }
 
