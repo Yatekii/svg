@@ -1,5 +1,10 @@
 use gfx;
 
+use lyon::tessellation::geometry_builder::VertexConstructor;
+use lyon::tessellation;
+
+use svg::primitive::*;
+
 pub type ColorFormat = gfx::format::Rgba8;
 pub type DepthFormat = gfx::format::DepthStencil;
 
@@ -7,6 +12,9 @@ gfx_defines!{
     vertex Vertex {
         position: [f32; 2] = "a_position",
         primitive_id: u32 = "a_prim_id",
+        local_transform_index: u32 = "local_transform_index",
+        group_transform_index: u32 = "group_transform_index",
+        color_index: u32 = "color_index",
     }
 
     // a 2x3 matrix (last two members of data1 unused).
@@ -49,7 +57,26 @@ impl tessellation::VertexConstructor<tessellation::FillVertex, Vertex> for Verte
         Vertex {
             position: vertex.position.to_array(),
             primitive_id: self.primitive_id,
+            local_transform_index: 0,
+            group_transform_index: 0,
+            color_index: 0,
         }
+    }
+}
+
+impl TransformPrimitive for Vertex {
+    fn set_local_transform_index(&mut self, index: u32) {
+        self.set_local_transform_index(index);
+    }
+
+    fn set_group_transform_index(&mut self, index: u32) {
+        self.set_group_transform_index(index);
+    }
+}
+
+impl ColorPrimitive for Vertex{
+    fn set_color_index(&mut self, index: u32) {
+        self.set_color_index(index)
     }
 }
 

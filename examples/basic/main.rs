@@ -1,8 +1,10 @@
+#[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;
 extern crate gfx_window_glutin;
 extern crate glutin;
 extern crate svg;
+extern crate lyon;
 
 mod render;
 
@@ -16,6 +18,8 @@ use svg::processor::process_tree;
 use gfx::traits::{Device, FactoryExt};
 use glutin::GlContext;
 
+use std::time::Instant;
+
 use render::{
     fill_pipeline, ColorFormat, DepthFormat, Scene
 };
@@ -26,7 +30,7 @@ const CANVAS_HEIGHT: f32 = 500.0;
 
 fn main() {
     // Create a new arena
-    let arena = &mut Arena::new();
+    let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
     let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
@@ -49,18 +53,6 @@ fn main() {
     //         .required(false))
     //     .get_matches();
 
-    let msaa = if let Some(msaa) = app.value_of("MSAA") {
-        match msaa.parse::<u16>() {
-            Ok(n) => Some(n),
-            Err(_) => {
-                println!("ERROR: `{}` is not a number", msaa);
-                std::process::exit(1);
-            }
-        }
-    } else {
-        None
-    };
-
     println!("Use arrow keys to pan, pageup and pagedown to zoom.");
 
     let scale = CANVAS_WIDTH / CANVAS_HEIGHT;
@@ -79,16 +71,15 @@ fn main() {
     let mut scene = Scene::new(zoom, pan, width / height);
 
     // Set up event processing and rendering
+    let mut event_loop = glutin::EventsLoop::new();
     let glutin_builder = glutin::WindowBuilder::new()
         .with_dimensions(width as u32, height as u32)
         .with_decorations(true)
         .with_title("SVG Renderer");
 
-    let msaa_samples = msaa.unwrap_or(0);
-
     // Create a new GL context.
     let context = glutin::ContextBuilder::new()
-        .with_multisampling(msaa_samples)
+        .with_multisampling(8)
         .with_vsync(true);
 
     // Create all the necessary context with the window.
@@ -103,9 +94,7 @@ fn main() {
 
     // Create the normal shader.
     let mut rasterizer_state = gfx::state::Rasterizer::new_fill();
-    if msaa.is_some() {
-        rasterizer_state.samples = Some(gfx::state::MultiSample);
-    }
+    rasterizer_state.samples = Some(gfx::state::MultiSample);
     let pso = factory.create_pipeline_from_program(
         &shader,
         gfx::Primitive::TriangleList,
@@ -125,8 +114,8 @@ fn main() {
 
     let mut cmd_queue: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
-    let globals = factory.create_constant_buffer(1);
-    let vehicle_attributes = factory.create_constant_buffer(1);
+    //let globals = factory.create_constant_buffer(1);
+    //let vehicle_attributes = factory.create_constant_buffer(1);
 
     loop {
         let t = Instant::now();
@@ -135,7 +124,7 @@ fn main() {
 
         cmd_queue.clear(&main_fbo.clone(), [0.15, 0.15, 0.16, 1.0]);
 
-        cmd_queue.update_constant_buffer(&globals, &scene.into());
+        //cmd_queue.update_constant_buffer(&globals, &scene.into());
 
         // TODO: Draw
         // vehicle_instances = vehicle_instances

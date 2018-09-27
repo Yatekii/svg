@@ -22,12 +22,6 @@ pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub color: Color,
 }
 
-pub struct PrimitiveIndex {
-    pub local_transform_id: u32,
-    pub group_transform_id: u32,
-    pub color: u32
-}
-
 impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
     pub fn new() -> VertexData<V> {
         VertexData {
