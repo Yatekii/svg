@@ -1,9 +1,11 @@
+use svg::geometry::Matrix;
 use gfx;
 
 use lyon::tessellation::geometry_builder::VertexConstructor;
 use lyon::tessellation;
 
 use svg::primitive::*;
+use svg::color;
 
 pub type ColorFormat = gfx::format::Rgba8;
 pub type DepthFormat = gfx::format::DepthStencil;
@@ -42,9 +44,7 @@ gfx_defines!{
 }
 
 // This struct carries the data for each vertex
-pub struct VertexCtor {
-    pub primitive_id: u32,
-}
+pub struct VertexCtor;
 
 // Handle conversions to the gfx vertex format
 impl tessellation::VertexConstructor<tessellation::FillVertex, Vertex> for VertexCtor {
@@ -54,7 +54,22 @@ impl tessellation::VertexConstructor<tessellation::FillVertex, Vertex> for Verte
 
         Vertex {
             position: vertex.position.to_array(),
-            primitive_id: self.primitive_id,
+            primitive_id: 0,
+            local_transform_index: 0,
+            group_transform_index: 0,
+            color_index: 0,
+        }
+    }
+}
+
+impl tessellation::VertexConstructor<tessellation::StrokeVertex, Vertex> for VertexCtor {
+    fn new_vertex(&mut self, vertex: tessellation::StrokeVertex) -> Vertex {
+        assert!(!vertex.position.x.is_nan());
+        assert!(!vertex.position.y.is_nan());
+
+        Vertex {
+            position: vertex.position.to_array(),
+            primitive_id: 0,
             local_transform_index: 0,
             group_transform_index: 0,
             color_index: 0,
@@ -98,6 +113,22 @@ impl Scene {
     }
 }
 
+impl From<color::Color> for Color {
+    fn from(color: color::Color) -> Self {
+        Color {
+            data: color.color
+        }
+    }
+}
+
+impl From<Matrix> for Transform {
+    fn from(matrix: Matrix) -> Self {
+        Transform {
+            data: matrix.into()
+        }
+    }
+}
+
 // Extract the relevant globals from the scene struct
 impl From<Scene> for Globals {
     fn from(scene: Scene) -> Self {
@@ -109,7 +140,7 @@ impl From<Scene> for Globals {
     }
 }
 
-pub static MAX_PRIMITIVES: usize = 512;
+pub static MAX_COLORS: usize = 512;
 pub static MAX_TRANSFORMS: usize = 512;
 
 pub static VERTEX_SHADER: &'static str = "

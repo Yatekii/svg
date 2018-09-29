@@ -1,3 +1,5 @@
+use geometry::Matrix;
+use color::Color;
 use element::circle::Circle;
 use element::Element;
 use element::ElementUpdate;
@@ -31,22 +33,24 @@ pub fn update_node<T>(element: &mut T, attribute_stack: &AttributeStack)
     element.set_group_transform(&attribute_stack.transform);
 }
 
-pub fn generate_buffer<V: TransformPrimitive + ColorPrimitive + Clone>(arena: &mut Arena<V>, node_id: NodeId, buffers: &mut Buffers<V>) {
+pub fn generate_buffer<V: TransformPrimitive + ColorPrimitive + Clone, M, C>(arena: &mut Arena<V>, node_id: NodeId, buffers: &mut Buffers<V, M, C>)
+where M: From<Matrix>, C: From<Color> {
     // We never access a node with an ID that does not exist.
     let node = arena.get(node_id).unwrap();
     match &node.data {
-        ElementType::Circle(circle) => (),
+        ElementType::Circle(circle) => add_to_buffer(circle, buffers),
         ElementType::Line(_line) => println!("Line"),
         ElementType::Path(_path) => println!("Path"),
         ElementType::Rect(_rect) => println!("Rect"),
-        ElementType::Group(group) => {
+        ElementType::Group(_group) => {
             for child_id in node_id.children(arena).collect::<Vec<NodeId>>() {
+                generate_buffer(arena, child_id, buffers);
             }
         },
     }
 }
 
-pub fn add_to_buffer<T, V: TransformPrimitive + ColorPrimitive + Clone>(element: &mut T, buffers: &mut Buffers<V>)
-    where T: ElementUpdate {
-    
+pub fn add_to_buffer<T, V, M, C>(element: &T, buffers: &mut Buffers<V, M, C>)
+    where T: Element<V>, V: TransformPrimitive + ColorPrimitive + Clone, M: From<Matrix>, C: From<Color> {
+    element.get_vertex_data().apply_to(buffers);
 }

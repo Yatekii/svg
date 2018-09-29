@@ -4,15 +4,29 @@ use primitive::*;
 
 use gfx;
 use lyon::tessellation;
+use lyon::tessellation::geometry_builder::{ VertexBuffers };
 use transform_data::TransformData;
 
 pub type ColorFormat = gfx::format::Rgba8;
 
-pub struct Buffers<V: TransformPrimitive + ColorPrimitive + Clone> {
+pub struct Buffers<V: TransformPrimitive + ColorPrimitive + Clone, M, C>
+where M: From<Matrix>, C: From<Color> {
     pub vbo: Vec<V>,
     pub ibo: Vec<u32>,
-    pub tbo: Vec<Matrix>,
-    pub cbo: Vec<Color>,
+    pub tbo: Vec<M>,
+    pub cbo: Vec<C>,
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone, M, C> Buffers<V, M, C>
+where M: From<Matrix>, C: From<Color> {
+    pub fn new() -> Buffers<V, M, C> {
+        Buffers {
+            vbo: vec![],
+            ibo: vec![],
+            tbo: vec![],
+            cbo: vec![],
+        }
+    }
 }
 
 pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -31,7 +45,18 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             color: Color::black(),
         }
     }
-    pub fn apply_to(&self, buffers: &mut Buffers<V>) {
+
+    pub fn from_vertex_buffers(vertex_buffers: VertexBuffers<V, u32>) -> VertexData<V> {
+        VertexData {
+            vbo: vertex_buffers.vertices,
+            ibo: vertex_buffers.indices,
+            transform_data: TransformData::new(),
+            color: Color::black(),
+        }
+    }
+
+    pub fn apply_to<M, C>(&self, buffers: &mut Buffers<V, M, C>)
+    where M: From<Matrix>, C: From<Color> {
         let len = buffers.vbo.len() as u32;
         let len_transform = buffers.tbo.len() as u32;
         buffers.vbo.extend(self.vbo.clone().drain(..).map(|mut v| {
@@ -41,8 +66,8 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             v
         }).collect::<Vec<_>>());
         buffers.ibo.extend(&self.ibo.iter().map(|x| x + len).collect::<Vec<_>>());
-        buffers.tbo.push(self.transform_data.local_transform);
-        buffers.tbo.push(self.transform_data.group_transform);
-        buffers.cbo.push(self.color);
+        buffers.tbo.push(self.transform_data.local_transform.into());
+        buffers.tbo.push(self.transform_data.group_transform.into());
+        buffers.cbo.push(self.color.into());
     }
 }

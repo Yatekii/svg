@@ -4,6 +4,7 @@ pub mod path;
 pub mod rect;
 pub mod group;
 
+use vertex_data::VertexData;
 pub use self::circle::Circle;
 pub use self::line::Line;
 pub use self::path::Path;
@@ -22,8 +23,8 @@ pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
     Group(group::Group),
 }
 
-pub trait Element {
-    fn get_vbo(&self) -> &Vec<i32>;
+pub trait Element<V: TransformPrimitive + ColorPrimitive + Clone> {
+    fn get_vertex_data(&self) -> &VertexData<V>;
     fn get_local_tranform(&self) -> &Matrix;
     fn get_group_tranform(&self) -> &Matrix;
     

@@ -14,7 +14,8 @@ use svg::element;
 use svg::element::ElementType;
 use svg::geometry::*;
 use svg::attribute_stack::*;
-use svg::processor::process_tree;
+use svg::processor::{ process_tree, generate_buffer };
+use svg::vertex_data::*;
 
 use gfx::traits::{Device, FactoryExt};
 use glutin::GlContext;
@@ -30,19 +31,6 @@ const CANVAS_WIDTH: f32 = 1200.0;
 const CANVAS_HEIGHT: f32 = 500.0;
 
 fn main() {
-    // Create a new arena
-    let arena = &mut Arena::<render::Vertex>::new();
-
-    // Add some new nodes to the arena
-    let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
-    let b = arena.new_node(ElementType::Circle(element::Circle::new()));
-
-    a.append(b, arena);
-
-    let attribute_stack = AttributeStack::new();
-
-    process_tree(attribute_stack, arena, a);
-
     // let app = App::new("Lyon svg_render example")
     //     .version("0.1")
     //     .arg(Arg::with_name("MSAA")
@@ -115,32 +103,63 @@ fn main() {
 
     let mut cmd_queue: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
-    let globals = factory.create_constant_buffer::<render::Globals>(1);
-    let transforms = factory.create_constant_buffer::<render::Transform>(1);
-    let colors = factory.create_constant_buffer::<render::Color>(1);
+    // -------------------------- Generate VBO ------------------------------- //
+
+    // Create a new arena
+    let arena = &mut Arena::<render::Vertex>::new();
+
+    // Add some new nodes to the arena
+    let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
+    let b = arena.new_node(ElementType::Circle(element::Circle::new(Point::new(0.0, 0.0), 1.0, render::VertexCtor)));
+
+    a.append(b, arena);
+
+    let attribute_stack = AttributeStack::new();
+
+    process_tree(attribute_stack, arena, a);
+
+    let buffers = &mut Buffers::new();
+    generate_buffer(arena, a, buffers);
+
+    println!("{:?}", buffers.vbo);
+
+    // ----------------------------------------------------------------------- //
 
     loop {
         //let t = Instant::now();
 
+        // Update the window view.
         gfx_window_glutin::update_views(&window, &mut main_fbo, &mut main_depth);
 
+        // Clear the draw canvas with a default color.
         cmd_queue.clear(&main_fbo.clone(), [0.15, 0.15, 0.16, 1.0]);
 
+        let globals = factory.create_constant_buffer::<render::Globals>(1);
+        let transforms = factory.create_constant_buffer::<render::Transform>(render::MAX_TRANSFORMS);
+        let colors = factory.create_constant_buffer::<render::Color>(render::MAX_COLORS);
+
+        // Update the global state.
         cmd_queue.update_constant_buffer(&globals, &scene.into());
 
-        // TODO: Draw
-        // vehicle_instances = vehicle_instances
-        //     .into_iter()
-        //     .filter(|vi| !vi.left_station)
-        //     .enumerate()
-        //     .map(|(i, mut instance)| {
-        //         instance.update(i);
-        //         cmd_queue.update_constant_buffer(&vehicle_attributes, &instance.clone().into());
-        //         instance.draw(&mut cmd_queue, if scene.wireframe { &wireframe_pso } else { &pso }, &globals, &vehicle_attributes, &main_fbo);
-        //         instance
-        //     })
-        //     .collect();
-        // mondaine.draw(&mut cmd_queue, if scene.wireframe { &wireframe_pso } else { &pso }, &globals, &vehicle_attributes, &main_fbo);
+        // Update the transform and the color buffers.
+        cmd_queue.update_buffer(&transforms, &buffers.tbo[..], 0).unwrap();
+        cmd_queue.update_buffer(&colors, &buffers.cbo[..], 0).unwrap();
+
+        let (vbo, ibo) = factory.create_vertex_buffer_with_slice(&buffers.vbo[..], &buffers.ibo[..]);
+
+        //println!("{:?}", vbo.len());
+
+        cmd_queue.draw(
+            &ibo,
+            &pso,
+            &render::fill_pipeline::Data {
+                vbo: vbo,
+                out_color: main_fbo.clone(),
+                globals: globals.clone(),
+                transforms: transforms,
+                colors: colors,
+            },
+        );
         
         cmd_queue.flush(&mut device);
 
