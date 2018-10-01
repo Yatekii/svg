@@ -3,7 +3,6 @@
 extern crate indextree;
 extern crate nalgebra;
 
-#[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;
 extern crate gfx_window_glutin;

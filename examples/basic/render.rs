@@ -1,7 +1,6 @@
 use svg::geometry::Matrix;
 use gfx;
 
-use lyon::tessellation::geometry_builder::VertexConstructor;
 use lyon::tessellation;
 
 use svg::primitive::*;

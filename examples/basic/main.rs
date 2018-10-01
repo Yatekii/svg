@@ -20,7 +20,7 @@ use svg::vertex_data::*;
 use gfx::traits::{Device, FactoryExt};
 use glutin::GlContext;
 
-use std::time::Instant;
+// use std::time::Instant;
 
 use render::{
     fill_pipeline, ColorFormat, DepthFormat, Scene
@@ -58,11 +58,11 @@ fn main() {
     // let pan = [CANVAS_WIDTH / -2.0, CANVAS_HEIGHT / -2.0];
     // let zoom = 2.0 / f32::max(CANVAS_WIDTH, CANVAS_HEIGHT);
     let pan = [0.0, 0.0];
-    let zoom = 2.0;
-    let mut scene = Scene::new(zoom, pan, width / height);
+    let zoom = 1.0;
+    let scene = Scene::new(zoom, pan, width / height);
 
     // Set up event processing and rendering
-    let mut event_loop = glutin::EventsLoop::new();
+    let event_loop = glutin::EventsLoop::new();
     let glutin_builder = glutin::WindowBuilder::new()
         .with_dimensions(width as u32, height as u32)
         .with_decorations(true)
@@ -96,12 +96,12 @@ fn main() {
     // Create the wireframe program.
     let mut rasterizer_state = gfx::state::Rasterizer::new_fill();
     rasterizer_state.method = gfx::state::RasterMethod::Line(1);
-    let wireframe_pso = factory.create_pipeline_from_program(
-        &shader,
-        gfx::Primitive::TriangleList,
-        rasterizer_state,
-        fill_pipeline::new(),
-    ).unwrap();
+    // let wireframe_pso = factory.create_pipeline_from_program(
+    //     &shader,
+    //     gfx::Primitive::TriangleList,
+    //     rasterizer_state,
+    //     fill_pipeline::new(),
+    // ).unwrap();
 
     let mut cmd_queue: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
@@ -114,7 +114,8 @@ fn main() {
     let builder = ElementBuilder::new(render::VertexCtor);
 
     let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
-    let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
+    //let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
+    let b = arena.new_node(ElementType::Rect(builder.rect().origin(Point::new(-0.5, -0.5)).dimensions(Vector::new(1.0, 1.0)).finalize()));
 
     a.append(b, arena);
 

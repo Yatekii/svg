@@ -5,9 +5,9 @@ use primitive::*;
 
 pub struct Line<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
-    origin: Point,
+    pub origin: Point,
     // Radius
-    radius: f32,
+    pub radius: f32,
     // TransformData
     pub transform_data: TransformData,
     // VertexData

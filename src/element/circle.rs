@@ -1,4 +1,3 @@
-use lyon::lyon_tessellation::GeometryBuilder;
 use lyon::tessellation::basic_shapes::*;
 use lyon::tessellation::{ StrokeVertex, FillVertex, StrokeOptions, FillOptions, VertexConstructor };
 use lyon::tessellation::geometry_builder::{VertexBuffers, BuffersBuilder};
@@ -6,12 +5,10 @@ use lyon::math as lmath;
 
 
 use color::Color;
-use element::ElementUpdate;
 use geometry::{ Point, Matrix };
 use primitive::*;
-use super::Element;
+use super::{ Element, ElementUpdate };
 
-use transform_data::TransformData;
 use vertex_data::VertexData;
 
 #[derive(Clone)]
@@ -60,27 +57,27 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
         }
     }
 
-    pub fn radius(&mut self, radius: f32) -> &mut Self {
+    pub fn radius(mut self, radius: f32) -> Self {
         self.circle.radius = radius;
         self
     }
 
-    pub fn center(&mut self, center: Point) -> &mut Self {
+    pub fn center(mut self, center: Point) -> Self {
         self.circle.center = center;
         self
     }
 
-    pub fn fill(&mut self, fill: bool) -> &mut Self {
+    pub fn fill(mut self, fill: bool) -> Self {
         self.circle.fill = fill;
         self
     }
 
-    pub fn color(&mut self, color: Color) -> &mut Self {
+    pub fn color(mut self, color: Color) -> Self {
         self.circle.color = color;
         self
     }
 
-    pub fn finalize(&mut self) -> Circle<V> {
+    pub fn finalize(mut self) -> Circle<V> {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -104,7 +101,7 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
         }
 
         self.circle.vertex_data = VertexData::from_vertex_buffers(mesh);
-        self.circle.clone()
+        self.circle
     }
 }
 

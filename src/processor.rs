@@ -1,6 +1,5 @@
 use geometry::Matrix;
 use color::Color;
-use element::circle::Circle;
 use element::Element;
 use element::ElementUpdate;
 use attribute_stack::*;
@@ -17,7 +16,7 @@ pub fn process_tree<V: TransformPrimitive + ColorPrimitive + Clone>(mut attribut
         ElementType::Circle(circle) => update_node(circle, &attribute_stack),
         ElementType::Line(_line) => println!("Line"),
         ElementType::Path(_path) => println!("Path"),
-        ElementType::Rect(_rect) => println!("Rect"),
+        ElementType::Rect(rect) => update_node(rect, &attribute_stack),
         ElementType::Group(group) => {
             println!("\tGroup");
             attribute_stack.transform *= &group.transform;
@@ -41,7 +40,7 @@ where M: From<Matrix>, C: From<Color> {
         ElementType::Circle(circle) => add_to_buffer(circle, buffers),
         ElementType::Line(_line) => println!("Line"),
         ElementType::Path(_path) => println!("Path"),
-        ElementType::Rect(_rect) => println!("Rect"),
+        ElementType::Rect(rect) => add_to_buffer(rect, buffers),
         ElementType::Group(_group) => {
             for child_id in node_id.children(arena).collect::<Vec<NodeId>>() {
                 generate_buffer(arena, child_id, buffers);

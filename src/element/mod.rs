@@ -12,6 +12,7 @@ pub use self::rect::Rect;
 pub use self::group::Group;
 
 use self::circle::CircleBuilder;
+use self::rect::RectBuilder;
 
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
@@ -60,9 +61,10 @@ impl<Ctor> ElementBuilder<Ctor> {
     //     self
     // }
 
-    // pub fn rect(&self) -> Rect {
-    //     self
-    // }
+    pub fn rect<V: TransformPrimitive + ColorPrimitive + Clone>(&self) -> RectBuilder<V, Ctor>
+    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
+        RectBuilder::new(self.0)
+    }
     
     // pub fn group(&self) -> Group {
     //     self

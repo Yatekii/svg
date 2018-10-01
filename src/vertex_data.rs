@@ -3,7 +3,6 @@ use super::color::Color;
 use primitive::*;
 
 use gfx;
-use lyon::tessellation;
 use lyon::tessellation::geometry_builder::{ VertexBuffers };
 use transform_data::TransformData;
 
