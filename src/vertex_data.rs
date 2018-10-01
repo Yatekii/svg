@@ -29,6 +29,7 @@ where M: From<Matrix>, C: From<Color> {
     }
 }
 
+#[derive(Clone)]
 pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub vbo: Vec<V>,
     pub ibo: Vec<u32>,

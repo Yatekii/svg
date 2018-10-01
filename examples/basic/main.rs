@@ -11,7 +11,7 @@ mod render;
 
 use svg::common::*;
 use svg::element;
-use svg::element::ElementType;
+use svg::element::{ ElementType, ElementBuilder };
 use svg::geometry::*;
 use svg::attribute_stack::*;
 use svg::processor::{ process_tree, generate_buffer };
@@ -55,8 +55,10 @@ fn main() {
 
     // init the scene object
     // use the viewBox, if available, to set the initial zoom and pan
-    let pan = [CANVAS_WIDTH / -2.0, CANVAS_HEIGHT / -2.0];
-    let zoom = 2.0 / f32::max(CANVAS_WIDTH, CANVAS_HEIGHT);
+    // let pan = [CANVAS_WIDTH / -2.0, CANVAS_HEIGHT / -2.0];
+    // let zoom = 2.0 / f32::max(CANVAS_WIDTH, CANVAS_HEIGHT);
+    let pan = [0.0, 0.0];
+    let zoom = 2.0;
     let mut scene = Scene::new(zoom, pan, width / height);
 
     // Set up event processing and rendering
@@ -109,8 +111,10 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
+    let builder = ElementBuilder::new(render::VertexCtor);
+
     let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
-    let b = arena.new_node(ElementType::Circle(element::Circle::new(Point::new(0.0, 0.0), 1.0, render::VertexCtor)));
+    let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
 
     a.append(b, arena);
 
@@ -122,6 +126,8 @@ fn main() {
     generate_buffer(arena, a, buffers);
 
     println!("{:?}", buffers.vbo);
+    println!("{:?}", buffers.tbo);
+    println!("{:?}", scene);
 
     // ----------------------------------------------------------------------- //
 

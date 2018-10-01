@@ -44,6 +44,7 @@ gfx_defines!{
 }
 
 // This struct carries the data for each vertex
+#[derive(Clone, Copy)]
 pub struct VertexCtor;
 
 // Handle conversions to the gfx vertex format

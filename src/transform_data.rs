@@ -1,5 +1,6 @@
 use geometry::*;
 
+#[derive(Clone)]
 pub struct TransformData {
     pub local_transform: Matrix,
     pub group_transform: Matrix,
