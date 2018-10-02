@@ -13,12 +13,14 @@ pub use self::group::Group;
 
 use self::circle::CircleBuilder;
 use self::rect::RectBuilder;
+use self::group::GroupBuilder;
 
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
 use geometry::Matrix;
 use color::Color;
 use primitive::*;
+use common::*;
 
 pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
     Circle(circle::Circle<V>),
@@ -26,6 +28,7 @@ pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
     Path(path::Path<V>),
     Rect(rect::Rect<V>),
     Group(group::Group),
+    None,
 }
 
 pub trait Element<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -41,16 +44,26 @@ pub trait ElementUpdate {
     fn set_color(&mut self, color: &Color);
 }
 
-pub struct ElementBuilder<Ctor>(Ctor);
+pub struct ElementBuilder<'a, V, Ctor>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone {
+    arena: &'a mut Arena<V>,
+    ctor: Ctor
+}
 
-impl<Ctor> ElementBuilder<Ctor> {
-    pub fn new(ctor: Ctor) -> Self {
-        ElementBuilder(ctor)
+impl<'a, V, Ctor> ElementBuilder<'a, V, Ctor>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone {
+    pub fn new(arena: &'a mut Arena<V>, ctor: Ctor) -> Self {
+        ElementBuilder {
+            arena: arena,
+            ctor: ctor,
+        }
     }
 
-    pub fn circle<V: TransformPrimitive + ColorPrimitive + Clone>(&self) -> CircleBuilder<V, Ctor>
+    pub fn circle(&self) -> CircleBuilder<V, Ctor>
     where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-        CircleBuilder::new(self.0)
+        CircleBuilder::new(self.ctor)
     }
 
     // pub fn line(&self) -> Line {
@@ -61,12 +74,15 @@ impl<Ctor> ElementBuilder<Ctor> {
     //     self
     // }
 
-    pub fn rect<V: TransformPrimitive + ColorPrimitive + Clone>(&self) -> RectBuilder<V, Ctor>
-    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-        RectBuilder::new(self.0)
+    pub fn rect(&self) -> RectBuilder<V, Ctor>
+    where
+        Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
+        RectBuilder::new(self.ctor)
     }
     
-    // pub fn group(&self) -> Group {
-    //     self
-    // }
+    pub fn group(&mut self) -> GroupBuilder<V, Ctor>
+    where
+        Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
+        GroupBuilder::new(self.arena, self.ctor)
+    }
 }

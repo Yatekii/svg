@@ -111,20 +111,22 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
-    let builder = ElementBuilder::new(render::VertexCtor);
+    {
+        let builder = ElementBuilder::new(arena, render::VertexCtor);
+    }
 
-    let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
-    //let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
-    let b = arena.new_node(ElementType::Rect(builder.rect().origin(Point::new(-0.5, -0.5)).dimensions(Vector::new(1.0, 1.0)).finalize()));
+    // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
+    // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
+    // // let b = arena.new_node(ElementType::Rect(builder.rect().origin(Point::new(-0.5, -0.5)).dimensions(Vector::new(1.0, 1.0)).finalize()));
 
-    a.append(b, arena);
+    // a.append(b, arena);
 
     let attribute_stack = AttributeStack::new();
 
-    process_tree(attribute_stack, arena, a);
+    // process_tree(attribute_stack, arena, a);
 
-    let buffers = &mut Buffers::new();
-    generate_buffer(arena, a, buffers);
+    // let buffers = &mut Buffers::new();
+    // generate_buffer(arena, a, buffers);
 
     println!("{:?}", buffers.vbo);
     println!("{:?}", buffers.tbo);

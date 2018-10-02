@@ -11,7 +11,6 @@ use super::{ Element, ElementUpdate };
 
 use vertex_data::VertexData;
 
-#[derive(Clone)]
 pub struct Circle<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
     pub center: Point,

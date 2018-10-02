@@ -24,6 +24,7 @@ pub fn process_tree<V: TransformPrimitive + ColorPrimitive + Clone>(mut attribut
                 process_tree(attribute_stack.clone(), arena, child_id);
             }
         },
+        _ => ()
     }
 }
 
@@ -46,6 +47,7 @@ where M: From<Matrix>, C: From<Color> {
                 generate_buffer(arena, child_id, buffers);
             }
         },
+        _ => ()
     }
 }
 
