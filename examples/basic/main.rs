@@ -1,4 +1,5 @@
 #![feature(duration_as_u128)]
+#![feature(nll)]
 #[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;
@@ -16,6 +17,7 @@ use svg::geometry::*;
 use svg::attribute_stack::*;
 use svg::processor::{ process_tree, generate_buffer };
 use svg::vertex_data::*;
+use svg::color::*;
 
 use gfx::traits::{Device, FactoryExt};
 use glutin::GlContext;
@@ -111,9 +113,15 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
-    {
-        let builder = ElementBuilder::new(arena, render::VertexCtor);
-    }
+    let mut b = ElementBuilder::new(arena, render::VertexCtor);
+    let root = b.group().append(b.circle().radius(42.0).color(Color::black()).finalize())
+                        .append(b.rect().dimensions(Vector::new(42.0, 42.0)).color(Color::black()).finalize())
+                        .append_node(
+                            b.group().append(b.circle().radius(42.0).color(Color::black()).finalize())
+                                    .append(b.rect().dimensions(Vector::new(42.0, 42.0)).color(Color::black()).finalize())
+                                    .finalize()
+                        )
+                        .finalize();
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
@@ -123,10 +131,10 @@ fn main() {
 
     let attribute_stack = AttributeStack::new();
 
-    // process_tree(attribute_stack, arena, a);
+    process_tree(attribute_stack, arena, root);
 
-    // let buffers = &mut Buffers::new();
-    // generate_buffer(arena, a, buffers);
+    let buffers = &mut Buffers::new();
+    generate_buffer(arena, root, buffers);
 
     println!("{:?}", buffers.vbo);
     println!("{:?}", buffers.tbo);

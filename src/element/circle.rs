@@ -7,7 +7,7 @@ use lyon::math as lmath;
 use color::Color;
 use geometry::{ Point, Matrix };
 use primitive::*;
-use super::{ Element, ElementUpdate };
+use super::{ ElementType, Element, ElementUpdate };
 
 use vertex_data::VertexData;
 
@@ -76,7 +76,7 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
         self
     }
 
-    pub fn finalize(mut self) -> Circle<V> {
+    pub fn finalize(mut self) -> ElementType<V> {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -100,7 +100,7 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
         }
 
         self.circle.vertex_data = VertexData::from_vertex_buffers(mesh);
-        self.circle
+        ElementType::Circle(self.circle)
     }
 }
 

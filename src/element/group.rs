@@ -37,7 +37,7 @@ where
         }
     }
 
-    pub fn commit(self) -> NodeId {
+    pub fn finalize(self) -> NodeId {
         // Unwrap is safe if we assume we never get an invalid NodeId.
         self.arena.get_mut(self.current_node).unwrap().data = ElementType::Group(self.group);
         self.current_node
@@ -45,6 +45,11 @@ where
 
     pub fn append(mut self, element: ElementType<V>) -> Self {
         self.current_node.append(self.arena.new_node(element), &mut self.arena);
+        self
+    }
+
+    pub fn append_node(mut self, node_id: NodeId) -> Self {
+        self.current_node.append(node_id, &mut self.arena);
         self
     }
 }
