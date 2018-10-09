@@ -4,52 +4,62 @@ use primitive::*;
 use element::*;
 
 pub struct Group {
+    pub local_nodes: Vec<NodeId>,
     pub transform: geometry::Matrix,
 }
 
 impl Group {
     pub fn new() -> Group {
         Group {
+            local_nodes: Vec::new(),
             transform: Matrix::identity(),
         }
     }
+
+    pub fn wrap<V>(self) -> ElementType<V>
+    where
+        V: TransformPrimitive + ColorPrimitive + Clone {
+        ElementType::Group(self)
+    }
 }
 
-pub struct GroupBuilder<'a, V, Ctor>
+pub struct GroupBuilder<'a, V>
 where
-    V: TransformPrimitive + ColorPrimitive + Clone {
+    V: 'a + TransformPrimitive + ColorPrimitive + Clone {
     arena: &'a mut Arena<V>,
-    current_node: NodeId,
-    ctor: Ctor,
     group: Group,
 }
 
-impl<'a, V, Ctor> GroupBuilder<'a, V, Ctor>
+impl<'a, V> GroupBuilder<'a, V>
 where
     V: TransformPrimitive + ColorPrimitive + Clone {
-    pub fn new(arena: &'a mut Arena<V>, ctor: Ctor) -> Self {
+
+    pub fn new(arena: &'a mut Arena<V>) -> Self {
         let node = arena.new_node(ElementType::None);
         Self {
             arena: arena,
-            current_node: node,
-            ctor: ctor,
             group: Group::new(),
         }
     }
 
-    pub fn finalize(self) -> NodeId {
+    pub fn append<F>(mut self, f: F) -> Self
+    where
+        F: FnOnce(GroupBuilder<V>) -> ElementType<V> + Sized {
+
+        let mut element = f(GroupBuilder::new(self.arena));
+        let child_nodes = if let ElementType::Group(ref mut group) = element {
+            group.local_nodes.drain(..).collect()
+        } else {
+            vec![]
+        };
+        let element_node = self.arena.new_node(element);
+        child_nodes.into_iter().for_each(|node| element_node.append(node, self.arena));
+        self.group.local_nodes.push(element_node);
+        self
+    }
+
+    pub fn finalize(self) -> Group {
         // Unwrap is safe if we assume we never get an invalid NodeId.
-        self.arena.get_mut(self.current_node).unwrap().data = ElementType::Group(self.group);
-        self.current_node
-    }
-
-    pub fn append(mut self, element: ElementType<V>) -> Self {
-        self.current_node.append(self.arena.new_node(element), &mut self.arena);
-        self
-    }
-
-    pub fn append_node(mut self, node_id: NodeId) -> Self {
-        self.current_node.append(node_id, &mut self.arena);
-        self
+        self.group
     }
 }

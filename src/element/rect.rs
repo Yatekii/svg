@@ -34,48 +34,33 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Rect<V> {
             vertex_data: VertexData::<V>::new(),
         }
     }
-}
-
-pub struct RectBuilder<V, Ctor>
-where
-V: TransformPrimitive + ColorPrimitive + Clone,
-Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> {
-    ctor: Ctor,
-    rect: Rect<V>
-}
-
-impl<V, Ctor> RectBuilder<V, Ctor>
-where
-V: TransformPrimitive + ColorPrimitive + Clone,
-Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-    pub fn new(ctor: Ctor) -> Self {
-        RectBuilder {
-            ctor: ctor,
-            rect: Rect::new()
-        }
-    }
 
     pub fn origin(mut self, origin: Point) -> Self {
-        self.rect.origin = origin;
+        self.origin = origin;
         self
     }
 
     pub fn dimensions(mut self, dimensions: Vector) -> Self {
-        self.rect.dimensions = dimensions;
+        self.dimensions = dimensions;
         self
     }
 
     pub fn fill(mut self, fill: bool) -> Self {
-        self.rect.fill = fill;
+        self.fill = fill;
         self
     }
 
     pub fn color(mut self, color: Color) -> Self {
-        self.rect.color = color;
+        self.color = color;
         self
     }
 
-    pub fn finalize(mut self) -> ElementType<V> {
+    pub fn wrap(self) -> ElementType<V> {
+        ElementType::Rect(self)
+    }
+
+    fn tesselate<Ctor>(&mut self, ctor: Ctor)
+    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -88,8 +73,8 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
         //      Y = bottommost point in normal notation as Y is inverted
         //          (Y positive points downwards on the screen)
         let euclid_rectangle = lmath::Rect::new(
-            lmath::Point::new(self.rect.origin.x, self.rect.origin.y),
-            lmath::Size::new(self.rect.dimensions.x, self.rect.dimensions.y)
+            lmath::Point::new(self.origin.x, self.origin.y),
+            lmath::Size::new(self.dimensions.x, self.dimensions.y)
         );
 
         if fill {
@@ -97,19 +82,18 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
                 &euclid_rectangle,
                 &r,
                 &FillOptions::default(),
-                &mut BuffersBuilder::new(&mut mesh, self.ctor)
+                &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         } else {
             let _ = stroke_rounded_rectangle(
                 &euclid_rectangle,
                 &r,
                 &w,
-                &mut BuffersBuilder::new(&mut mesh, self.ctor)
+                &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         }
 
-        self.rect.vertex_data = VertexData::from_vertex_buffers(mesh);
-        ElementType::Rect(self.rect)
+        self.vertex_data = VertexData::from_vertex_buffers(mesh);
     }
 }
 

@@ -10,11 +10,6 @@ pub use self::line::Line;
 pub use self::path::Path;
 pub use self::rect::Rect;
 pub use self::group::Group;
-
-use self::circle::CircleBuilder;
-use self::rect::RectBuilder;
-use self::group::GroupBuilder;
-
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
 use geometry::Matrix;
@@ -46,7 +41,7 @@ pub trait ElementUpdate {
 
 pub struct ElementBuilder<'a, V, Ctor>
 where
-    V: TransformPrimitive + ColorPrimitive + Clone {
+    V: 'a + TransformPrimitive + ColorPrimitive + Clone {
     arena: &'a mut Arena<V>,
     ctor: Ctor
 }
@@ -59,30 +54,5 @@ where
             arena: arena,
             ctor: ctor,
         }
-    }
-
-    pub fn circle(&self) -> CircleBuilder<V, Ctor>
-    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-        CircleBuilder::new(self.ctor)
-    }
-
-    // pub fn line(&self) -> Line {
-    //     self
-    // }
-
-    // pub fn path(&self) -> Path {
-    //     self
-    // }
-
-    pub fn rect(&self) -> RectBuilder<V, Ctor>
-    where
-        Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-        RectBuilder::new(self.ctor)
-    }
-    
-    pub fn group(&mut self) -> GroupBuilder<V, Ctor>
-    where
-        Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-        GroupBuilder::new(self.arena, self.ctor)
     }
 }

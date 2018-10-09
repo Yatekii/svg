@@ -35,48 +35,33 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
             vertex_data: VertexData::<V>::new(),
         }
     }
-}
-
-pub struct CircleBuilder<V, Ctor>
-where
-V: TransformPrimitive + ColorPrimitive + Clone,
-Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> {
-    ctor: Ctor,
-    circle: Circle<V>
-}
-
-impl<V, Ctor> CircleBuilder<V, Ctor>
-where
-V: TransformPrimitive + ColorPrimitive + Clone,
-Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
-    pub fn new(ctor: Ctor) -> Self {
-        CircleBuilder {
-            ctor: ctor,
-            circle: Circle::new()
-        }
-    }
 
     pub fn radius(mut self, radius: f32) -> Self {
-        self.circle.radius = radius;
+        self.radius = radius;
         self
     }
 
     pub fn center(mut self, center: Point) -> Self {
-        self.circle.center = center;
+        self.center = center;
         self
     }
 
     pub fn fill(mut self, fill: bool) -> Self {
-        self.circle.fill = fill;
+        self.fill = fill;
         self
     }
 
     pub fn color(mut self, color: Color) -> Self {
-        self.circle.color = color;
+        self.color = color;
         self
     }
 
-    pub fn finalize(mut self) -> ElementType<V> {
+    pub fn wrap(self) -> ElementType<V> {
+        ElementType::Circle(self)
+    }
+
+    fn tesselate<Ctor>(&mut self, ctor: Ctor)
+    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -85,22 +70,21 @@ Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Co
 
         if fill {
             let _ = fill_circle(
-                lmath::Point::new(self.circle.center.x, self.circle.center.y),
-                self.circle.radius,
+                lmath::Point::new(self.center.x, self.center.y),
+                self.radius,
                 &FillOptions::default(),
-                &mut BuffersBuilder::new(&mut mesh, self.ctor)
+                &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         } else {
             let _ = stroke_circle(
-                lmath::Point::new(self.circle.center.x, self.circle.center.y),
-                self.circle.radius,
+                lmath::Point::new(self.center.x, self.center.y),
+                self.radius,
                 &w,
-                &mut BuffersBuilder::new(&mut mesh, self.ctor)
+                &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         }
 
-        self.circle.vertex_data = VertexData::from_vertex_buffers(mesh);
-        ElementType::Circle(self.circle)
+        self.vertex_data = VertexData::from_vertex_buffers(mesh);
     }
 }
 

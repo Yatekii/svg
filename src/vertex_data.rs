@@ -30,8 +30,9 @@ where M: From<Matrix>, C: From<Color> {
 
 #[derive(Clone)]
 pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
-    pub vbo: Vec<V>,
-    pub ibo: Vec<u32>,
+    vbo: Vec<V>,
+    ibo: Vec<u32>,
+    dirty: bool,
     pub transform_data: TransformData,
     pub color: Color,
 }
@@ -41,6 +42,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         VertexData {
             vbo: vec![],
             ibo: vec![],
+            dirty: false,
             transform_data: TransformData::new(),
             color: Color::black(),
         }
@@ -50,9 +52,20 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         VertexData {
             vbo: vertex_buffers.vertices,
             ibo: vertex_buffers.indices,
+            dirty: false,
             transform_data: TransformData::new(),
             color: Color::black(),
         }
+    }
+
+    pub fn set_vertx_data(&mut self, vbo: Vec<V>, ibo: Vec<u32>) {
+        self.vbo = vbo;
+        self.ibo = ibo;
+        self.dirty = true;
+    }
+
+    pub fn is_dirty(&self) -> bool {
+        self.dirty
     }
 
     pub fn apply_to<M, C>(&self, buffers: &mut Buffers<V, M, C>)

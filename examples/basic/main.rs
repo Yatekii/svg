@@ -12,7 +12,8 @@ mod render;
 
 use svg::common::*;
 use svg::element;
-use svg::element::{ ElementType, ElementBuilder };
+use svg::element::{ ElementType, ElementBuilder, Circle, Rect };
+use svg::element::group::GroupBuilder;
 use svg::geometry::*;
 use svg::attribute_stack::*;
 use svg::processor::{ process_tree, generate_buffer };
@@ -113,15 +114,28 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
-    let mut b = ElementBuilder::new(arena, render::VertexCtor);
-    let root = b.group().append(b.circle().radius(42.0).color(Color::black()).finalize())
-                        .append(b.rect().dimensions(Vector::new(42.0, 42.0)).color(Color::black()).finalize())
-                        .append_node(
-                            b.group().append(b.circle().radius(42.0).color(Color::black()).finalize())
-                                    .append(b.rect().dimensions(Vector::new(42.0, 42.0)).color(Color::black()).finalize())
-                                    .finalize()
-                        )
-                        .finalize();
+    let b = GroupBuilder::new(arena);
+    let root = b.append(|_b| Circle::new()
+                                .radius(42.0)
+                                .color(Color::black())
+                                .wrap())
+                .append(|_b| Rect::new()
+                                .dimensions(Vector::new(42.0, 42.0))
+                                .color(Color::black())
+                                .wrap())
+                .append(|b| b.append(|_b| Circle::new()
+                                            .radius(42.0)
+                                            .color(Color::black())
+                                            .wrap())
+                                .append(|_b| Rect::new()
+                                                .dimensions(Vector::new(42.0, 42.0))
+                                                .color(Color::black())
+                                                .wrap())
+                                .finalize()
+                                .wrap()
+                )
+                .finalize()
+                .wrap::<render::Vertex>();
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
@@ -131,10 +145,10 @@ fn main() {
 
     let attribute_stack = AttributeStack::new();
 
-    process_tree(attribute_stack, arena, root);
+    //process_tree(attribute_stack, arena, root);
 
     let buffers = &mut Buffers::new();
-    generate_buffer(arena, root, buffers);
+    //generate_buffer(arena, root, buffers);
 
     println!("{:?}", buffers.vbo);
     println!("{:?}", buffers.tbo);
