@@ -11,6 +11,7 @@ use super::{ ElementType, Element, ElementUpdate };
 
 use vertex_data::VertexData;
 
+#[derive(Debug)]
 pub struct Circle<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
     pub center: Point,
@@ -37,21 +38,25 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
     }
 
     pub fn radius(mut self, radius: f32) -> Self {
+        self.make_dirty();
         self.radius = radius;
         self
     }
 
     pub fn center(mut self, center: Point) -> Self {
+        self.make_dirty();
         self.center = center;
         self
     }
 
     pub fn fill(mut self, fill: bool) -> Self {
+        self.make_dirty();
         self.fill = fill;
         self
     }
 
     pub fn color(mut self, color: Color) -> Self {
+        self.make_dirty();
         self.color = color;
         self
     }
@@ -60,8 +65,33 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
         ElementType::Circle(self)
     }
 
-    fn tesselate<Ctor>(&mut self, ctor: Ctor)
-    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
+    fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> Element<V> for Circle<V> {
+    fn get_vertex_data(&self) -> &VertexData<V> {
+        &self.vertex_data
+    }
+
+    fn get_local_tranform(&self) -> &Matrix {
+        &self.vertex_data.transform_data.local_transform
+    }
+
+    fn get_group_tranform(&self) -> &Matrix {
+        &self.vertex_data.transform_data.group_transform
+    }
+}
+
+impl<V, Ctor> ElementUpdate<V, Ctor> for Circle<V>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone,
+    Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
+{
+    fn is_dirty(&self) -> bool { self.vertex_data.is_dirty() }
+
+    fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
+
+    fn tesselate(&mut self, ctor: Ctor) {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -86,23 +116,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
 
         self.vertex_data = VertexData::from_vertex_buffers(mesh);
     }
-}
 
-impl<V: TransformPrimitive + ColorPrimitive + Clone> Element<V> for Circle<V> {
-    fn get_vertex_data(&self) -> &VertexData<V> {
-        &self.vertex_data
-    }
-
-    fn get_local_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.local_transform
-    }
-
-    fn get_group_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.group_transform
-    }
-}
-
-impl<V: TransformPrimitive + ColorPrimitive + Clone> ElementUpdate for Circle<V> {
     fn set_group_transform(&mut self, transform: &Matrix) {
         self.vertex_data.transform_data.group_transform = transform.clone();
     }

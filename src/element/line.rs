@@ -3,6 +3,7 @@ use vertex_data::VertexData;
 use geometry::{ Point };
 use primitive::*;
 
+#[derive(Debug)]
 pub struct Line<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
     pub origin: Point,

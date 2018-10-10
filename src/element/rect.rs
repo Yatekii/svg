@@ -10,7 +10,7 @@ use super::{ ElementType, Element, ElementUpdate };
 
 use vertex_data::VertexData;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Rect<V: TransformPrimitive + ColorPrimitive + Clone> {
     // Top left
     pub origin: Point,
@@ -36,21 +36,25 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Rect<V> {
     }
 
     pub fn origin(mut self, origin: Point) -> Self {
+        self.make_dirty();
         self.origin = origin;
         self
     }
 
     pub fn dimensions(mut self, dimensions: Vector) -> Self {
+        self.make_dirty();
         self.dimensions = dimensions;
         self
     }
 
     pub fn fill(mut self, fill: bool) -> Self {
+        self.make_dirty();
         self.fill = fill;
         self
     }
 
     pub fn color(mut self, color: Color) -> Self {
+        self.make_dirty();
         self.color = color;
         self
     }
@@ -59,8 +63,33 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Rect<V> {
         ElementType::Rect(self)
     }
 
-    fn tesselate<Ctor>(&mut self, ctor: Ctor)
-    where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy {
+    fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> Element<V> for Rect<V> {
+    fn get_vertex_data(&self) -> &VertexData<V> {
+        &self.vertex_data
+    }
+
+    fn get_local_tranform(&self) -> &Matrix {
+        &self.vertex_data.transform_data.local_transform
+    }
+
+    fn get_group_tranform(&self) -> &Matrix {
+        &self.vertex_data.transform_data.group_transform
+    }
+}
+
+impl<V, Ctor> ElementUpdate<V, Ctor> for Rect<V>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone,
+    Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
+{
+    fn is_dirty(&self) -> bool { self.vertex_data.is_dirty() }
+
+    fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
+
+    fn tesselate(&mut self, ctor: Ctor) {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(6.5);
@@ -95,23 +124,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Rect<V> {
 
         self.vertex_data = VertexData::from_vertex_buffers(mesh);
     }
-}
 
-impl<V: TransformPrimitive + ColorPrimitive + Clone> Element<V> for Rect<V> {
-    fn get_vertex_data(&self) -> &VertexData<V> {
-        &self.vertex_data
-    }
-
-    fn get_local_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.local_transform
-    }
-
-    fn get_group_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.group_transform
-    }
-}
-
-impl<V: TransformPrimitive + ColorPrimitive + Clone> ElementUpdate for Rect<V> {
     fn set_group_transform(&mut self, transform: &Matrix) {
         self.vertex_data.transform_data.group_transform = transform.clone();
     }

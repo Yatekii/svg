@@ -28,7 +28,7 @@ where M: From<Matrix>, C: From<Color> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     vbo: Vec<V>,
     ibo: Vec<u32>,
@@ -67,6 +67,8 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
     pub fn is_dirty(&self) -> bool {
         self.dirty
     }
+
+    pub fn make_dirty(&mut self) { self.dirty = true; }
 
     pub fn apply_to<M, C>(&self, buffers: &mut Buffers<V, M, C>)
     where M: From<Matrix>, C: From<Color> {

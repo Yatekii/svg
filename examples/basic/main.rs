@@ -10,6 +10,8 @@ extern crate lyon;
 
 mod render;
 
+use std::time::Instant;
+
 use svg::common::*;
 use svg::element;
 use svg::element::{ ElementType, ElementBuilder, Circle, Rect };
@@ -110,32 +112,34 @@ fn main() {
 
     // -------------------------- Generate VBO ------------------------------- //
 
+    let t = Instant::now();
+
     // Create a new arena
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
     let b = GroupBuilder::new(arena);
-    let root = b.append(|_b| Circle::new()
-                                .radius(42.0)
-                                .color(Color::black())
-                                .wrap())
-                .append(|_b| Rect::new()
-                                .dimensions(Vector::new(42.0, 42.0))
-                                .color(Color::black())
-                                .wrap())
-                .append(|b| b.append(|_b| Circle::new()
-                                            .radius(42.0)
-                                            .color(Color::black())
-                                            .wrap())
-                                .append(|_b| Rect::new()
-                                                .dimensions(Vector::new(42.0, 42.0))
-                                                .color(Color::black())
-                                                .wrap())
-                                .finalize()
-                                .wrap()
-                )
-                .finalize()
-                .wrap::<render::Vertex>();
+    let root =
+        b.append(|_b| Circle::new()
+            .radius(42.0)
+            .color(Color::black())
+            .wrap())
+        .append(|_b| Rect::new()
+            .dimensions(Vector::new(42.0, 42.0))
+            .color(Color::black())
+            .wrap())
+        .append(|b|
+            b.append(|_b| Circle::new()
+                .radius(42.0)
+                .color(Color::black())
+                .wrap())
+            .append(|_b| Rect::new()
+                .dimensions(Vector::new(42.0, 42.0))
+                .color(Color::black())
+                .wrap())
+            .finalize()
+            .wrap())
+        .to_root();
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));
@@ -145,14 +149,16 @@ fn main() {
 
     let attribute_stack = AttributeStack::new();
 
-    //process_tree(attribute_stack, arena, root);
+    process_tree(render::VertexCtor, attribute_stack, arena, root);
 
     let buffers = &mut Buffers::new();
-    //generate_buffer(arena, root, buffers);
+    generate_buffer(arena, root, buffers);
 
     println!("{:?}", buffers.vbo);
     println!("{:?}", buffers.tbo);
     println!("{:?}", scene);
+
+    println!("It took {}us to tesselate.", t.elapsed().as_micros());
 
     // ----------------------------------------------------------------------- //
 

@@ -3,6 +3,7 @@ use common::*;
 use primitive::*;
 use element::*;
 
+#[derive(Debug)]
 pub struct Group {
     pub local_nodes: Vec<NodeId>,
     pub transform: geometry::Matrix,
@@ -40,6 +41,14 @@ where
             arena: arena,
             group: Group::new(),
         }
+    }
+
+    pub fn to_root(mut self) -> NodeId {
+        let child_nodes: Vec<NodeId> = self.group.local_nodes.drain(..).collect();
+        let root_node = self.arena.new_node(self.group.wrap());
+        let arena = self.arena;
+        child_nodes.into_iter().for_each(|node| root_node.append(node, arena));
+        root_node
     }
 
     pub fn append<F>(mut self, f: F) -> Self
