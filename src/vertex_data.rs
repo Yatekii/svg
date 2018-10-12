@@ -36,6 +36,7 @@ pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub transform_data: TransformData,
     pub fill: Color,
     pub stroke: Color,
+    pub stroke_width: f32,
 }
 
 impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
@@ -47,6 +48,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             transform_data: TransformData::new(),
             fill: Color::black(),
             stroke: Color::none(),
+            stroke_width: 1.0,
         }
     }
 
@@ -58,6 +60,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             transform_data: TransformData::new(),
             fill: Color::black(),
             stroke: Color::none(),
+            stroke_width: 1.0,
         }
     }
 

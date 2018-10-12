@@ -15,7 +15,6 @@ use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 use geometry::Matrix;
 use color::Color;
 use primitive::*;
-use common::*;
 
 #[derive(Debug)]
 pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -47,6 +46,7 @@ where
 }
 
 pub trait BasicStylableElement {
-    fn fill(mut self, fill: Color) -> Self;
-    fn stroke(mut self, stroke: Color) -> Self;
+    fn fill(self, fill: Color) -> Self;
+    fn stroke(self, stroke: Color) -> Self;
+    fn stroke_width(self, width: f32) -> Self;
 }

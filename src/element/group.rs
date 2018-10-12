@@ -36,7 +36,6 @@ where
     V: TransformPrimitive + ColorPrimitive + Clone {
 
     pub fn new(arena: &'a mut Arena<V>) -> Self {
-        let node = arena.new_node(ElementType::None);
         Self {
             arena: arena,
             group: Group::new(),

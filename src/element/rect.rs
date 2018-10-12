@@ -92,7 +92,7 @@ where
     fn tesselate(&mut self, ctor: Ctor) {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
-        let w = StrokeOptions::default().with_line_width(6.5);
+        let w = StrokeOptions::default().with_line_width(self.vertex_data.stroke_width);
 
         let fill = true;
 
@@ -146,6 +146,12 @@ where
     fn stroke(mut self, stroke: Color) -> Self {
         self.make_dirty();
         self.vertex_data.stroke = stroke;
+        self
+    }
+
+    fn stroke_width(mut self, width: f32) -> Self {
+        self.make_dirty();
+        self.vertex_data.stroke_width = width;
         self
     }
 }
