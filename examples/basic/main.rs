@@ -62,7 +62,7 @@ fn main() {
     // let pan = [CANVAS_WIDTH / -2.0, CANVAS_HEIGHT / -2.0];
     // let zoom = 2.0 / f32::max(CANVAS_WIDTH, CANVAS_HEIGHT);
     let pan = [0.0, 0.0];
-    let zoom = 1.0;
+    let zoom = 0.5;
     let scene = Scene::new(zoom, pan, width / height);
 
     // Set up event processing and rendering
@@ -121,9 +121,10 @@ fn main() {
     let b = GroupBuilder::new(arena);
     let root =
         b.append(|_b| Circle::new()
-            .radius(1.0)
+            .radius(0.2)
             .cx(-0.5)
             .cy(-0.5)
+            .fill(Color::blue())
             .wrap())
         .append(|_b| Rect::new()
             .x(1.0)
@@ -133,8 +134,8 @@ fn main() {
             .wrap())
         .append(|b|
             b.append(|_b| Circle::new()
-                .radius(1.0)
-                .fill(Color::black())
+                .radius(0.3)
+                .fill(Color::blue())
                 .wrap())
             .append(|_b| Rect::new()
                 .dimensions(Vector::new(1.0, 1.0))

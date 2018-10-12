@@ -8,6 +8,7 @@ use transform_data::TransformData;
 
 pub type ColorFormat = gfx::format::Rgba8;
 
+#[derive(Debug)]
 pub struct Buffers<V: TransformPrimitive + ColorPrimitive + Clone, M, C>
 where M: From<Matrix>, C: From<Color> {
     pub vbo: Vec<V>,
@@ -44,7 +45,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         VertexData {
             vbo: vec![],
             ibo: vec![],
-            dirty: false,
+            dirty: true,
             transform_data: TransformData::new(),
             fill: Color::black(),
             stroke: Color::none(),
@@ -56,7 +57,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         VertexData {
             vbo: vertex_buffers.vertices,
             ibo: vertex_buffers.indices,
-            dirty: false,
+            dirty: true,
             transform_data: TransformData::new(),
             fill: Color::black(),
             stroke: Color::none(),
@@ -77,7 +78,10 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
     pub fn make_dirty(&mut self) { self.dirty = true; }
 
     pub fn apply_to<M, C>(&self, buffers: &mut Buffers<V, M, C>)
-    where M: From<Matrix>, C: From<Color> {
+    where
+        M: From<Matrix>, C: From<Color>,
+        C: std::fmt::Debug,
+    {
         let len = buffers.vbo.len() as u32;
         let len_transform = buffers.tbo.len() as u32;
         buffers.vbo.extend(self.vbo.clone().drain(..).map(|mut v| {
