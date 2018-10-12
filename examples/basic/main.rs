@@ -13,8 +13,7 @@ mod render;
 use std::time::Instant;
 
 use svg::common::*;
-use svg::element;
-use svg::element::{ ElementType, ElementBuilder, Circle, Rect };
+use svg::element::{ Circle, Rect };
 use svg::element::group::GroupBuilder;
 use svg::geometry::*;
 use svg::attribute_stack::*;
@@ -118,24 +117,28 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
+    use svg::element::BasicStylableElement;
     let b = GroupBuilder::new(arena);
     let root =
         b.append(|_b| Circle::new()
-            .radius(42.0)
-            .color(Color::black())
+            .radius(1.0)
+            .cx(-0.5)
+            .cy(-0.5)
             .wrap())
         .append(|_b| Rect::new()
-            .dimensions(Vector::new(42.0, 42.0))
-            .color(Color::black())
+            .x(1.0)
+            .y(1.0)
+            .width(0.5)
+            .height(0.5)
             .wrap())
         .append(|b|
             b.append(|_b| Circle::new()
-                .radius(42.0)
-                .color(Color::black())
+                .radius(1.0)
+                .fill(Color::black())
                 .wrap())
             .append(|_b| Rect::new()
-                .dimensions(Vector::new(42.0, 42.0))
-                .color(Color::black())
+                .dimensions(Vector::new(1.0, 1.0))
+                .fill(Color::black())
                 .wrap())
             .finalize()
             .wrap())

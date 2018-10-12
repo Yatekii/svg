@@ -15,7 +15,6 @@ use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 use geometry::Matrix;
 use color::Color;
 use primitive::*;
-use common::*;
 
 #[derive(Debug)]
 pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -44,23 +43,10 @@ where
     fn tesselate(&mut self, ctor: Ctor);
     fn set_group_transform(&mut self, transform: &Matrix);
     fn set_local_transform(&mut self, transform: &Matrix);
-    fn set_color(&mut self, color: &Color);
 }
 
-pub struct ElementBuilder<'a, V, Ctor>
-where
-    V: 'a + TransformPrimitive + ColorPrimitive + Clone {
-    arena: &'a mut Arena<V>,
-    ctor: Ctor
-}
-
-impl<'a, V, Ctor> ElementBuilder<'a, V, Ctor>
-where
-    V: TransformPrimitive + ColorPrimitive + Clone {
-    pub fn new(arena: &'a mut Arena<V>, ctor: Ctor) -> Self {
-        ElementBuilder {
-            arena: arena,
-            ctor: ctor,
-        }
-    }
+pub trait BasicStylableElement {
+    fn fill(self, fill: Color) -> Self;
+    fn stroke(self, stroke: Color) -> Self;
+    fn stroke_width(self, width: f32) -> Self;
 }
