@@ -44,23 +44,9 @@ where
     fn tesselate(&mut self, ctor: Ctor);
     fn set_group_transform(&mut self, transform: &Matrix);
     fn set_local_transform(&mut self, transform: &Matrix);
-    fn set_color(&mut self, color: &Color);
 }
 
-pub struct ElementBuilder<'a, V, Ctor>
-where
-    V: 'a + TransformPrimitive + ColorPrimitive + Clone {
-    arena: &'a mut Arena<V>,
-    ctor: Ctor
-}
-
-impl<'a, V, Ctor> ElementBuilder<'a, V, Ctor>
-where
-    V: TransformPrimitive + ColorPrimitive + Clone {
-    pub fn new(arena: &'a mut Arena<V>, ctor: Ctor) -> Self {
-        ElementBuilder {
-            arena: arena,
-            ctor: ctor,
-        }
-    }
+pub trait BasicStylableElement {
+    fn fill(mut self, fill: Color) -> Self;
+    fn stroke(mut self, stroke: Color) -> Self;
 }

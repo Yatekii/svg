@@ -6,7 +6,7 @@ use lyon::math as lmath;
 use color::Color;
 use geometry::{ Point, Vector, Matrix };
 use primitive::*;
-use super::{ ElementType, Element, ElementUpdate };
+use super::{ ElementType, Element, ElementUpdate, BasicStylableElement };
 
 use vertex_data::VertexData;
 
@@ -16,10 +16,6 @@ pub struct Rect<V: TransformPrimitive + ColorPrimitive + Clone> {
     pub origin: Point,
     // Width, Height
     pub dimensions: Vector,
-    // Is the circle filled or just a stroke
-    pub fill: bool,
-    // Color (fill or stroke)
-    pub color: Color,
     // VertexData
     pub vertex_data: VertexData<V>,
 }
@@ -29,33 +25,37 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Rect<V> {
         Rect {
             origin: Point::origin(),
             dimensions: Vector::identity(),
-            fill: true,
-            color: Color::black(),
             vertex_data: VertexData::<V>::new(),
         }
     }
 
     pub fn origin(mut self, origin: Point) -> Self {
-        self.make_dirty();
         self.origin = origin;
         self
     }
 
+    pub fn x(mut self, x: f32) -> Self {
+        self.origin.x = x;
+        self
+    }
+
+    pub fn y(mut self, y: f32) -> Self {
+        self.origin.y = y;
+        self
+    }
+
+    pub fn width(mut self, width: f32) -> Self {
+        self.dimensions.x = width;
+        self
+    }
+
+    pub fn height(mut self, height: f32) -> Self {
+        self.dimensions.y = height;
+        self
+    }
+
     pub fn dimensions(mut self, dimensions: Vector) -> Self {
-        self.make_dirty();
         self.dimensions = dimensions;
-        self
-    }
-
-    pub fn fill(mut self, fill: bool) -> Self {
-        self.make_dirty();
-        self.fill = fill;
-        self
-    }
-
-    pub fn color(mut self, color: Color) -> Self {
-        self.make_dirty();
-        self.color = color;
         self
     }
 
@@ -122,7 +122,7 @@ where
             );
         }
 
-        self.vertex_data = VertexData::from_vertex_buffers(mesh);
+        self.vertex_data.set_vertex_data(mesh.vertices, mesh.indices);
     }
 
     fn set_group_transform(&mut self, transform: &Matrix) {
@@ -132,8 +132,20 @@ where
     fn set_local_transform(&mut self, transform: &Matrix) {
         self.vertex_data.transform_data.local_transform = transform.clone();
     }
+}
 
-    fn set_color(&mut self, color: &Color) {
-        self.vertex_data.color = color.clone();
+impl<V> BasicStylableElement for Rect<V>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone
+{
+    fn fill(mut self, fill: Color) -> Self {
+        self.vertex_data.fill = fill;
+        self
+    }
+
+    fn stroke(mut self, stroke: Color) -> Self {
+        self.make_dirty();
+        self.vertex_data.stroke = stroke;
+        self
     }
 }

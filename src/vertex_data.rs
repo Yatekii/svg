@@ -34,7 +34,8 @@ pub struct VertexData<V: TransformPrimitive + ColorPrimitive + Clone> {
     ibo: Vec<u32>,
     dirty: bool,
     pub transform_data: TransformData,
-    pub color: Color,
+    pub fill: Color,
+    pub stroke: Color,
 }
 
 impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
@@ -44,7 +45,8 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             ibo: vec![],
             dirty: false,
             transform_data: TransformData::new(),
-            color: Color::black(),
+            fill: Color::black(),
+            stroke: Color::none(),
         }
     }
 
@@ -54,11 +56,12 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
             ibo: vertex_buffers.indices,
             dirty: false,
             transform_data: TransformData::new(),
-            color: Color::black(),
+            fill: Color::black(),
+            stroke: Color::none(),
         }
     }
 
-    pub fn set_vertx_data(&mut self, vbo: Vec<V>, ibo: Vec<u32>) {
+    pub fn set_vertex_data(&mut self, vbo: Vec<V>, ibo: Vec<u32>) {
         self.vbo = vbo;
         self.ibo = ibo;
         self.dirty = true;
@@ -83,6 +86,7 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         buffers.ibo.extend(&self.ibo.iter().map(|x| x + len).collect::<Vec<_>>());
         buffers.tbo.push(self.transform_data.local_transform.into());
         buffers.tbo.push(self.transform_data.group_transform.into());
-        buffers.cbo.push(self.color.into());
+        buffers.cbo.push(self.fill.into());
+        // TODO: stroke
     }
 }

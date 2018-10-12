@@ -14,7 +14,7 @@ use std::time::Instant;
 
 use svg::common::*;
 use svg::element;
-use svg::element::{ ElementType, ElementBuilder, Circle, Rect };
+use svg::element::{ ElementType, Circle, Rect };
 use svg::element::group::GroupBuilder;
 use svg::geometry::*;
 use svg::attribute_stack::*;
@@ -118,24 +118,23 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
+    use svg::element::BasicStylableElement;
     let b = GroupBuilder::new(arena);
     let root =
         b.append(|_b| Circle::new()
             .radius(42.0)
-            .color(Color::black())
             .wrap())
         .append(|_b| Rect::new()
             .dimensions(Vector::new(42.0, 42.0))
-            .color(Color::black())
             .wrap())
         .append(|b|
             b.append(|_b| Circle::new()
                 .radius(42.0)
-                .color(Color::black())
+                .fill(Color::black())
                 .wrap())
             .append(|_b| Rect::new()
                 .dimensions(Vector::new(42.0, 42.0))
-                .color(Color::black())
+                .fill(Color::black())
                 .wrap())
             .finalize()
             .wrap())
