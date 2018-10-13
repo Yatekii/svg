@@ -24,7 +24,7 @@ where
     let node = arena.get_mut(node_id).unwrap();
     match &mut node.data {
         ElementType::Circle(circle) => update_node(ctor, circle, &attribute_stack),
-        ElementType::Line(_line) => println!("Line"),
+        ElementType::Line(line) =>  update_node(ctor, line, &attribute_stack),
         ElementType::Path(_path) => println!("Path"),
         ElementType::Rect(rect) => update_node(ctor, rect, &attribute_stack),
         ElementType::Group(group) => {
@@ -58,7 +58,7 @@ where
     let node = arena.get(node_id).unwrap();
     match &node.data {
         ElementType::Circle(circle) => add_to_buffer(circle, buffers),
-        ElementType::Line(_line) => println!("Line"),
+        ElementType::Line(line) => add_to_buffer(line, buffers),
         ElementType::Path(_path) => println!("Path"),
         ElementType::Rect(rect) => add_to_buffer(rect, buffers),
         ElementType::Group(_group) => {

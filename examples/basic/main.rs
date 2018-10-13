@@ -13,7 +13,7 @@ mod render;
 use std::time::Instant;
 
 use svg::common::*;
-use svg::element::{ Circle, Rect };
+use svg::element::{ Circle, Rect, Line };
 use svg::element::group::GroupBuilder;
 use svg::geometry::*;
 use svg::attribute_stack::*;
@@ -130,7 +130,15 @@ fn main() {
             .x(1.0)
             .y(1.0)
             .width(0.5)
-            .height(0.5)
+            .height(0.7)
+            .wrap())
+        .append(|_b| Line::new()
+            .x1(0.5)
+            .y1(0.5)
+            .x2(-0.5)
+            .y2(-0.5)
+            .fill(Color::red())
+            .stroke_width(0.01)
             .wrap())
         .append(|b|
             b.append(|_b| Circle::new()
