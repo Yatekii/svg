@@ -85,15 +85,35 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> VertexData<V> {
         let len = buffers.vbo.len() as u32;
         let len_transform = buffers.tbo.len() as u32;
         buffers.vbo.extend(self.vbo.clone().drain(..).map(|mut v| {
-            v.set_local_transform_index(len_transform);
-            v.set_group_transform_index(len_transform + 1);
+            v.set_real_transform_index(len_transform);
             v.set_color_index(buffers.cbo.len() as u32);
             v
         }).collect::<Vec<_>>());
         buffers.ibo.extend(&self.ibo.iter().map(|x| x + len).collect::<Vec<_>>());
-        buffers.tbo.push(self.transform_data.local_transform.into());
-        buffers.tbo.push(self.transform_data.group_transform.into());
+        buffers.tbo.push(self.transform_data.real_transform.into());
         buffers.cbo.push(self.fill.into());
         // TODO: stroke
+    }
+
+    fn set_real_transform(&mut self) {
+        self.transform_data.real_transform = self.transform_data.group_transform * self.transform_data.local_transform;
+    }
+
+    pub fn set_local_transform(&mut self, transform: Matrix) {
+        self.transform_data.local_transform = transform;
+        self.set_real_transform();
+    }
+
+    pub fn set_group_transform(&mut self, transform: Matrix) {
+        self.transform_data.group_transform = transform;
+        self.set_real_transform();
+    }
+
+    pub fn get_local_tranform(&self) -> &Matrix {
+        &self.transform_data.local_transform
+    }
+
+    pub fn get_real_transform(&self) -> &Matrix {
+        &self.transform_data.real_transform
     }
 }

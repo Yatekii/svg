@@ -4,6 +4,7 @@ use geometry::*;
 pub struct TransformData {
     pub local_transform: Matrix,
     pub group_transform: Matrix,
+    pub real_transform: Matrix,
 }
 
 impl TransformData {
@@ -11,6 +12,7 @@ impl TransformData {
         TransformData {
             local_transform: Matrix::identity(),
             group_transform: Matrix::identity(),
+            real_transform: Matrix::identity(),
         }
     }
 }

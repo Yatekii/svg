@@ -120,7 +120,8 @@ fn main() {
     use svg::element::BasicStylableElement;
     let b = GroupBuilder::new(arena);
     let root =
-        b.append(|_b| Circle::new()
+        b.map(|g| g.transform(Matrix::new_scaling(3.0)))
+        .append(|_b| Circle::new()
             .radius(0.2)
             .cx(-0.5)
             .cy(-0.5)

@@ -1,6 +1,5 @@
 pub trait TransformPrimitive {
-    fn set_local_transform_index(&mut self, index: u32);
-    fn set_group_transform_index(&mut self, index: u32);
+    fn set_real_transform_index(&mut self, index: u32);
 }
 
 pub trait ColorPrimitive {
