@@ -12,8 +12,7 @@ pub type DepthFormat = gfx::format::DepthStencil;
 gfx_defines!{
     vertex Vertex {
         position: [f32; 2] = "a_position",
-        local_transform_index: u32 = "a_local_transform_index",
-        group_transform_index: u32 = "a_group_transform_index",
+        real_transform_index: u32 = "a_real_transform_index",
         color_index: u32 = "a_color_index",
     }
 
@@ -53,8 +52,7 @@ impl tessellation::VertexConstructor<tessellation::FillVertex, Vertex> for Verte
 
         Vertex {
             position: vertex.position.to_array(),
-            local_transform_index: 0,
-            group_transform_index: 0,
+            real_transform_index: 0,
             color_index: 0,
         }
     }
@@ -67,20 +65,15 @@ impl tessellation::VertexConstructor<tessellation::StrokeVertex, Vertex> for Ver
 
         Vertex {
             position: vertex.position.to_array(),
-            local_transform_index: 0,
-            group_transform_index: 0,
+            real_transform_index: 0,
             color_index: 0,
         }
     }
 }
 
 impl TransformPrimitive for Vertex {
-    fn set_local_transform_index(&mut self, index: u32) {
-        self.local_transform_index = index;
-    }
-
-    fn set_group_transform_index(&mut self, index: u32) {
-        self.group_transform_index = index;
+    fn set_real_transform_index(&mut self, index: u32) {
+        self.real_transform_index = index;
     }
 }
 
@@ -162,13 +155,13 @@ pub static VERTEX_SHADER: &'static str = "
     uniform u_transforms { Transform transforms[512]; };
 
     in vec2 a_position;
-    in uint a_local_transform_index;
+    in uint a_real_transform_index;
     in uint a_color_index;
 
     out vec4 v_color;
 
     void main() {
-        mat4 transform = transforms[a_local_transform_index].data;
+        mat4 transform = transforms[a_real_transform_index].data;
         vec4 color = colors[a_color_index].data;
 
         vec2 pos = (transform * vec4(a_position, 1.0, 1.0)).xy;

@@ -6,7 +6,6 @@ use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
 use geometry::Matrix;
 use color::Color;
-use element::Element;
 use element::ElementUpdate;
 use attribute_stack::*;
 use common::*;
@@ -39,11 +38,11 @@ where
 
 pub fn update_node<T, V, Ctor>(ctor: Ctor, element: &mut T, attribute_stack: &AttributeStack)
 where
-    T: ElementUpdate<V, Ctor>,
+    T: ElementUpdate<V>,
     V: TransformPrimitive + ColorPrimitive + Clone + std::fmt::Debug,
     Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
 {
-    element.set_group_transform(&attribute_stack.transform);
+    element.get_vertex_data_mut().set_group_transform(attribute_stack.transform);
     if element.is_dirty() {
         element.tesselate(ctor);
     }
@@ -52,7 +51,7 @@ where
 pub fn generate_buffer<V: TransformPrimitive + ColorPrimitive + Clone, M, C>(arena: &mut Arena<V>, node_id: NodeId, buffers: &mut Buffers<V, M, C>)
 where
     M: From<Matrix>,
-    C: From<Color> + std::fmt::Debug
+    C: From<Color> + std::fmt::Debug,
 {
     // We never access a node with an ID that does not exist.
     let node = arena.get(node_id).unwrap();
@@ -72,7 +71,7 @@ where
 
 pub fn add_to_buffer<T, V, M, C>(element: &T, buffers: &mut Buffers<V, M, C>)
 where
-    T: Element<V>, V: TransformPrimitive + ColorPrimitive + Clone, M: From<Matrix>, C: From<Color>,
+    T: ElementUpdate<V>, V: TransformPrimitive + ColorPrimitive + Clone, M: From<Matrix>, C: From<Color>,
     C: std::fmt::Debug,
 {
     element.get_vertex_data().apply_to(buffers);
