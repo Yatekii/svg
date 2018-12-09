@@ -7,7 +7,7 @@ use lyon::math as lmath;
 use color::Color;
 use geometry::{ Point, Matrix };
 use primitive::*;
-use super::{ ElementType, Element, ElementUpdate, BasicStylableElement };
+use super::{ ElementType, ElementUpdate, BasicStylableElement };
 
 use vertex_data::VertexData;
 
@@ -63,30 +63,18 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> Circle<V> {
     fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
 }
 
-impl<V: TransformPrimitive + ColorPrimitive + Clone> Element<V> for Circle<V> {
-    fn get_vertex_data(&self) -> &VertexData<V> {
-        &self.vertex_data
-    }
-
-    fn get_local_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.local_transform
-    }
-
-    fn get_group_tranform(&self) -> &Matrix {
-        &self.vertex_data.transform_data.group_transform
-    }
-}
-
-impl<V, Ctor> ElementUpdate<V, Ctor> for Circle<V>
+impl<V> ElementUpdate<V> for Circle<V>
 where
-    V: TransformPrimitive + ColorPrimitive + Clone,
-    Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
+    V: TransformPrimitive + ColorPrimitive + Clone
 {
     fn is_dirty(&self) -> bool { self.vertex_data.is_dirty() }
 
     fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
 
-    fn tesselate(&mut self, ctor: Ctor) {
+    fn tesselate<Ctor>(&mut self, ctor: Ctor)
+    where
+        Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
+    {
         let mut mesh: VertexBuffers<V, u32> = VertexBuffers::new();
 
         let w = StrokeOptions::default().with_line_width(self.vertex_data.stroke_width);
@@ -112,12 +100,12 @@ where
         self.vertex_data.set_vertex_data(mesh.vertices, mesh.indices);
     }
 
-    fn set_group_transform(&mut self, transform: &Matrix) {
-        self.vertex_data.transform_data.group_transform = transform.clone();
+    fn get_vertex_data(&self) -> &VertexData<V> {
+        &self.vertex_data
     }
 
-    fn set_local_transform(&mut self, transform: &Matrix) {
-        self.vertex_data.transform_data.local_transform = transform.clone();
+    fn get_vertex_data_mut(&mut self) -> &mut VertexData<V> {
+        &mut self.vertex_data
     }
 }
 
@@ -139,6 +127,11 @@ where
     fn stroke_width(mut self, width: f32) -> Self {
         self.make_dirty();
         self.vertex_data.stroke_width = width;
+        self
+    }
+
+    fn transform(mut self, matrix: Matrix) -> Self {
+        self.vertex_data.set_local_transform(matrix);
         self
     }
 }

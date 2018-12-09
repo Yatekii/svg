@@ -7,6 +7,9 @@ use element::*;
 pub struct Group {
     pub local_nodes: Vec<NodeId>,
     pub transform: geometry::Matrix,
+    pub fill: Color,
+    pub stroke: Color,
+    pub stroke_width: f32,
 }
 
 impl Group {
@@ -14,6 +17,9 @@ impl Group {
         Group {
             local_nodes: Vec::new(),
             transform: Matrix::identity(),
+            fill: Color::black(),
+            stroke: Color::none(),
+            stroke_width: 1.0,
         }
     }
 
@@ -68,8 +74,15 @@ where
         self
     }
 
+    pub fn map<F>(mut self, f: F) -> Self
+    where
+        F: FnOnce(Group) -> Group + Sized
+    {
+        self.group = f(self.group);
+        self
+    }
+
     pub fn finalize(self) -> Group {
-        // Unwrap is safe if we assume we never get an invalid NodeId.
         self.group
     }
 }
@@ -87,5 +100,28 @@ where
     V: TransformPrimitive + ColorPrimitive + Clone {
     fn from(group_builder: GroupBuilder<'a, V>) -> Self {
         ElementType::Group(group_builder.group)
+    }
+}
+
+impl BasicStylableElement for Group
+{
+    fn fill(mut self, fill: Color) -> Self {
+        self.fill = fill;
+        self
+    }
+
+    fn stroke(mut self, stroke: Color) -> Self {
+        self.stroke = stroke;
+        self
+    }
+
+    fn stroke_width(mut self, width: f32) -> Self {
+        self.stroke_width = width;
+        self
+    }
+
+    fn transform(mut self, matrix: Matrix) -> Self {
+        self.transform = matrix;
+        self
     }
 }

@@ -69,20 +69,20 @@ pub trait Element<V: TransformPrimitive + ColorPrimitive + Clone> {
     
 }
 
-pub trait ElementUpdate<V, Ctor>
+pub trait ElementUpdate<V>
 where
-    V: TransformPrimitive + ColorPrimitive + Clone,
-    Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
+    V: TransformPrimitive + ColorPrimitive + Clone
 {
     fn is_dirty(&self) -> bool;
     fn make_dirty(&mut self);
-    fn tesselate(&mut self, ctor: Ctor);
-    fn set_group_transform(&mut self, transform: &Matrix);
-    fn set_local_transform(&mut self, transform: &Matrix);
+    fn get_vertex_data(&self) -> &VertexData<V>;
+    fn get_vertex_data_mut(&mut self) -> &mut VertexData<V>;
+    fn tesselate<Ctor>(&mut self, ctor: Ctor) where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy;
 }
 
 pub trait BasicStylableElement {
     fn fill(self, fill: Color) -> Self;
     fn stroke(self, stroke: Color) -> Self;
     fn stroke_width(self, width: f32) -> Self;
+    fn transform(self, transform: Matrix) -> Self;
 }
