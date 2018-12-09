@@ -26,6 +26,42 @@ pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
     None,
 }
 
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<circle::Circle<V>> for ElementType<V> {
+    fn from(circle: circle::Circle<V>) -> Self {
+        ElementType::Circle(circle)
+    }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<line::Line<V>> for ElementType<V> {
+    fn from(line: line::Line<V>) -> Self {
+        ElementType::Line(line)
+    }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<path::Path<V>> for ElementType<V> {
+    fn from(path: path::Path<V>) -> Self {
+        ElementType::Path(path)
+    }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<rect::Rect<V>> for ElementType<V> {
+    fn from(rect: rect::Rect<V>) -> Self {
+        ElementType::Rect(rect)
+    }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<group::Group> for ElementType<V> {
+    fn from(group: group::Group) -> Self {
+        ElementType::Group(group)
+    }
+}
+
+impl<V: TransformPrimitive + ColorPrimitive + Clone> From<()> for ElementType<V> {
+    fn from(_: ()) -> Self {
+        ElementType::None
+    }
+}
+
 pub trait Element<V: TransformPrimitive + ColorPrimitive + Clone> {
     fn get_vertex_data(&self) -> &VertexData<V>;
     fn get_local_tranform(&self) -> &Matrix;

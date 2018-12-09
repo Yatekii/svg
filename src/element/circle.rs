@@ -97,7 +97,7 @@ where
             let _ = fill_circle(
                 lmath::Point::new(self.center.x, self.center.y),
                 self.radius,
-                &FillOptions::default(),
+                &FillOptions::tolerance(0.01),
                 &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         } else {

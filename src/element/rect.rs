@@ -110,7 +110,7 @@ where
             let _ = fill_rounded_rectangle(
                 &euclid_rectangle,
                 &r,
-                &FillOptions::default(),
+                &FillOptions::tolerance(0.000001),
                 &mut BuffersBuilder::new(&mut mesh, ctor)
             );
         } else {

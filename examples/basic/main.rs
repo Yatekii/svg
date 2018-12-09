@@ -125,13 +125,13 @@ fn main() {
             .cx(-0.5)
             .cy(-0.5)
             .fill(Color::blue())
-            .wrap())
+        )
         .append(|_b| Rect::new()
             .x(1.0)
             .y(1.0)
             .width(0.5)
             .height(0.7)
-            .wrap())
+        )
         .append(|_b| Line::new()
             .x1(0.5)
             .y1(0.5)
@@ -139,18 +139,17 @@ fn main() {
             .y2(-0.5)
             .fill(Color::red())
             .stroke_width(0.01)
-            .wrap())
+        )
         .append(|b|
             b.append(|_b| Circle::new()
                 .radius(0.3)
                 .fill(Color::blue())
-                .wrap())
+            )
             .append(|_b| Rect::new()
                 .dimensions(Vector::new(1.0, 1.0))
                 .fill(Color::black())
-                .wrap())
-            .finalize()
-            .wrap())
+            )
+        )
         .to_root();
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
@@ -165,10 +164,6 @@ fn main() {
 
     let buffers = &mut Buffers::new();
     generate_buffer(arena, root, buffers);
-
-    println!("{:?}", buffers.vbo);
-    println!("{:?}", buffers.tbo);
-    println!("{:?}", scene);
 
     println!("It took {}us to tesselate.", t.elapsed().as_micros());
 
