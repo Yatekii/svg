@@ -32,7 +32,7 @@ impl Group {
 
 pub struct GroupBuilder<'a, V>
 where
-    V: 'a + TransformPrimitive + ColorPrimitive + Clone {
+    V: TransformPrimitive + ColorPrimitive + Clone {
     arena: &'a mut Arena<V>,
     group: Group,
 }
@@ -59,18 +59,17 @@ where
     pub fn append<I, F>(mut self, f: F) -> Self
     where
         I: Into<ElementType<V>>,
-        F: FnOnce(GroupBuilder<'a, V>) -> I {
+        F: FnOnce(GroupBuilder<'_, V>) -> I {
 
-        // TODO: fix!
-        // let mut element = { f(GroupBuilder::new(self.arena)).into() };
-        // let child_nodes = if let ElementType::Group(ref mut group) = element {
-        //     group.local_nodes.drain(..).collect()
-        // } else {
-        //     vec![]
-        // };
-        // let element_node = self.arena.new_node(element);
-        // child_nodes.into_iter().for_each(|node| element_node.append(node, self.arena));
-        // self.group.local_nodes.push(element_node);
+        let mut element = { f(GroupBuilder::new(self.arena)).into() };
+        let child_nodes = if let ElementType::Group(ref mut group) = element {
+            group.local_nodes.drain(..).collect()
+        } else {
+            vec![]
+        };
+        let element_node = self.arena.new_node(element);
+        child_nodes.into_iter().for_each(|node| element_node.append(node, self.arena));
+        self.group.local_nodes.push(element_node);
         self
     }
 
@@ -84,22 +83,6 @@ where
 
     pub fn finalize(self) -> Group {
         self.group
-    }
-}
-
-impl<'a, V> From<GroupBuilder<'a, V>> for Group
-where
-    V: TransformPrimitive + ColorPrimitive + Clone {
-    fn from(group_builder: GroupBuilder<'a, V>) -> Self {
-        group_builder.group
-    }
-}
-
-impl<'a, V> From<GroupBuilder<'a, V>> for ElementType<V>
-where
-    V: TransformPrimitive + ColorPrimitive + Clone {
-    fn from(group_builder: GroupBuilder<'a, V>) -> Self {
-        ElementType::Group(group_builder.group)
     }
 }
 

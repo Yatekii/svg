@@ -23,7 +23,6 @@ pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
     Path(path::Path<V>),
     Rect(rect::Rect<V>),
     Group(group::Group),
-    None,
 }
 
 impl<V: TransformPrimitive + ColorPrimitive + Clone> From<circle::Circle<V>> for ElementType<V> {
@@ -53,12 +52,6 @@ impl<V: TransformPrimitive + ColorPrimitive + Clone> From<rect::Rect<V>> for Ele
 impl<V: TransformPrimitive + ColorPrimitive + Clone> From<group::Group> for ElementType<V> {
     fn from(group: group::Group) -> Self {
         ElementType::Group(group)
-    }
-}
-
-impl<V: TransformPrimitive + ColorPrimitive + Clone> From<()> for ElementType<V> {
-    fn from(_: ()) -> Self {
-        ElementType::None
     }
 }
 
