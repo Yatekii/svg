@@ -1,3 +1,4 @@
+use basic_style::BasicStylableElement;
 use geometry;
 use common::*;
 use primitive::*;
@@ -88,23 +89,19 @@ where
 
 impl BasicStylableElement for Group
 {
-    fn fill(mut self, fill: Color) -> Self {
+    impl_basic_style!(self, [fill, fill_ref](fill: Color) {
         self.fill = fill;
-        self
-    }
+    });
 
-    fn stroke(mut self, stroke: Color) -> Self {
+    impl_basic_style!(self, [stroke, stroke_ref](stroke: Color) {
         self.stroke = stroke;
-        self
-    }
+    });
 
-    fn stroke_width(mut self, width: f32) -> Self {
-        self.stroke_width = width;
-        self
-    }
+    impl_basic_style!(self, [stroke_width, stroke_width_ref](stroke_width: f32) {
+        self.stroke_width = stroke_width;
+    });
 
-    fn transform(mut self, matrix: Matrix) -> Self {
+    impl_basic_style!(self, [transform, transform_ref](matrix: Matrix) {
         self.transform = matrix;
-        self
-    }
+    });
 }

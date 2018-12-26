@@ -10,6 +10,8 @@ extern crate glutin;
 extern crate lyon;
 extern crate usvg;
 
+#[macro_use]
+pub mod basic_style;
 pub mod element;
 pub mod geometry;
 
@@ -20,6 +22,7 @@ pub mod color;
 pub mod attribute_stack;
 pub mod processor;
 pub mod primitive;
+pub mod transform;
 
 #[cfg(test)]
 mod tests {

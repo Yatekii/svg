@@ -1,3 +1,5 @@
+
+
 pub mod circle;
 pub mod line;
 pub mod path;
@@ -71,11 +73,4 @@ where
     fn get_vertex_data(&self) -> &VertexData<V>;
     fn get_vertex_data_mut(&mut self) -> &mut VertexData<V>;
     fn tesselate<Ctor>(&mut self, ctor: Ctor) where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy;
-}
-
-pub trait BasicStylableElement {
-    fn fill(self, fill: Color) -> Self;
-    fn stroke(self, stroke: Color) -> Self;
-    fn stroke_width(self, width: f32) -> Self;
-    fn transform(self, transform: Matrix) -> Self;
 }

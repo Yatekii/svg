@@ -3,10 +3,9 @@ use lyon::tessellation::{ StrokeVertex, FillVertex, StrokeOptions, FillOptions, 
 use lyon::tessellation::geometry_builder::{VertexBuffers, BuffersBuilder};
 use lyon::math as lmath;
 
-use color::Color;
-use geometry::{ Point, Vector, Matrix };
+use geometry::{ Point, Vector };
 use primitive::*;
-use super::{ ElementType, ElementUpdate, BasicStylableElement };
+use super::{ ElementType, ElementUpdate };
 
 use vertex_data::VertexData;
 
@@ -122,29 +121,4 @@ where
     }
 }
 
-impl<V> BasicStylableElement for Rect<V>
-where
-    V: TransformPrimitive + ColorPrimitive + Clone
-{
-    fn fill(mut self, fill: Color) -> Self {
-        self.vertex_data.fill = fill;
-        self
-    }
-
-    fn stroke(mut self, stroke: Color) -> Self {
-        self.make_dirty();
-        self.vertex_data.stroke = stroke;
-        self
-    }
-
-    fn stroke_width(mut self, width: f32) -> Self {
-        self.make_dirty();
-        self.vertex_data.stroke_width = width;
-        self
-    }
-
-    fn transform(mut self, matrix: Matrix) -> Self {
-        self.vertex_data.set_local_transform(matrix);
-        self
-    }
-}
+impl_basic_styles_for_struct!(Rect);
