@@ -13,10 +13,24 @@ where
     root: NodeId
 }
 
+impl<'a, V> Extractor<'a, V>
+where V: TransformPrimitive + ColorPrimitive + Clone {
+    pub fn new(arena: &'a mut Arena<V>, root: NodeId) -> Extractor<V> {
+        Extractor {
+            arena,
+            root
+        }
+    }
+
+    pub fn query(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement)) -> Iter<'_, V> {
+        Iter::new(self.arena, self.root)
+    } 
+}
+
 pub struct Iter<'a, V>
 where
     V: TransformPrimitive + ColorPrimitive + Clone {
-    arena: Option<&'a mut Arena<V>>,
+    arena: &'a mut Arena<V>,
     root: NodeId,
     returned: bool
 }
@@ -26,18 +40,11 @@ where
     V: TransformPrimitive + ColorPrimitive + Clone {
     pub fn new(arena: &'a mut Arena<V>, root: NodeId) -> Self {
         Iter {
-            arena: Some(arena),
+            arena: arena,
             root,
             returned: false
         }
     }
-}
-
-impl<'a, V> Extractor<'a, V>
-where V: TransformPrimitive + ColorPrimitive + Clone {
-    fn query(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement)) -> Iter<'_, V> {
-        Iter::new(self.arena, self.root)
-    } 
 }
 
 impl<'a, V> Iterator for Iter<'a, V>
@@ -45,10 +52,7 @@ where V: TransformPrimitive + ColorPrimitive + Clone  {
     type Item = &'a mut Node<V>;
 
     fn next(&mut self) -> Option<&'a mut Node<V>> {
-        if !self.returned {
-            return self.arena.take().unwrap().get_mut(self.root);
-        }
-        None
+        if !self.returned { unsafe { self.arena.get_mut(self.root).map(|node| &mut *(node as *mut _)) } } else { None }
     }
 }
 

@@ -1,6 +1,7 @@
 use geometry::*;
 use super::color::Color;
 use primitive::*;
+use std;
 
 use gfx;
 use lyon::tessellation::geometry_builder::{ VertexBuffers };

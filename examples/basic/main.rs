@@ -74,7 +74,7 @@ fn main() {
 
     // Create a new GL context.
     let context = glutin::ContextBuilder::new()
-        .with_multisampling(8);
+        .with_multisampling(4);
         //.with_vsync(true);
 
     // Create all the necessary context with the window.
@@ -117,7 +117,10 @@ fn main() {
     let arena = &mut Arena::<render::Vertex>::new();
 
     // Add some new nodes to the arena
-    use svg::element::BasicStylableElement;
+    use svg::basic_style::BasicStylableElement;
+    use svg::transform::Extractor;
+    use svg::transform::Transformer;
+
     let b = GroupBuilder::new(arena);
     let root =
         b.map(|g| g.transform(Matrix::new_scaling(1.0)))
@@ -152,6 +155,9 @@ fn main() {
             ).finalize()
         )
         .to_root();
+    
+    let extractor = Extractor::new(arena, root);
+    extractor.query(|node| true).map(|node| node.transform(|node| node.transform(Matrix::new_scaling(3.0))));
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));

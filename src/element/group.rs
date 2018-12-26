@@ -53,7 +53,10 @@ where
         let child_nodes: Vec<NodeId> = self.group.local_nodes.drain(..).collect();
         let root_node = self.arena.new_node(self.group.wrap());
         let arena = self.arena;
-        child_nodes.into_iter().for_each(|node| root_node.append(node, arena));
+        child_nodes.into_iter()
+                    .map(|node| root_node.append(node, arena))
+                    .collect::<Result<Vec<_>, _>>()
+                    .expect("This is a bug. Please report it.");
         root_node
     }
 
@@ -69,7 +72,10 @@ where
             vec![]
         };
         let element_node = self.arena.new_node(element);
-        child_nodes.into_iter().for_each(|node| element_node.append(node, self.arena));
+        child_nodes.into_iter()
+                    .map(|node| element_node.append(node, self.arena))
+                    .collect::<Result<Vec<_>, _>>()
+                    .expect("This is a bug. Please report it.");
         self.group.local_nodes.push(element_node);
         self
     }
