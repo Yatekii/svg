@@ -1,5 +1,3 @@
-
-
 pub mod circle;
 pub mod line;
 pub mod path;
@@ -14,8 +12,6 @@ pub use self::rect::Rect;
 pub use self::group::Group;
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
-use geometry::Matrix;
-use color::Color;
 use primitive::*;
 
 #[derive(Debug)]
@@ -73,4 +69,38 @@ where
     fn get_vertex_data(&self) -> &VertexData<V>;
     fn get_vertex_data_mut(&mut self) -> &mut VertexData<V>;
     fn tesselate<Ctor>(&mut self, ctor: Ctor) where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy;
+}
+
+use geometry::Matrix;
+use color::Color;
+use basic_style::BasicStylableElement;
+impl<V> ElementType<V>
+where
+    V: TransformPrimitive + ColorPrimitive + Clone
+{
+    impl_element_style!(c, [fill, fill_ref](fill: Color) {
+        c.vertex_data.fill = fill;
+    } {
+        c.fill = fill;
+    });
+
+    impl_element_style!(c, [stroke, stroke_ref](stroke: Color) {
+        c.make_dirty();
+        c.vertex_data.stroke = stroke;
+    } {
+        c.stroke = stroke;
+    });
+
+    impl_element_style!(c, [stroke_width, stroke_width_ref](stroke_width: f32) {
+        c.make_dirty();
+        c.vertex_data.stroke_width = stroke_width;
+    } {
+        c.stroke_width = stroke_width;
+    });
+
+    impl_element_style!(c, [transform, transform_ref](matrix: Matrix) {
+        c.vertex_data.set_local_transform(matrix);
+    } {
+        c.transform = matrix;
+    });
 }

@@ -13,6 +13,31 @@ pub trait BasicStylableElement {
 }
 
 #[macro_export]
+macro_rules! impl_element_style {
+    ( $c:ident, [$func_name:ident, $func_name_ref:ident]( $( $name:ident:$args:ty ), * ) $body_geometry:block $body_group:block) => (
+        pub fn $func_name(self, $( $name:$args ), *) -> Self {
+            match self {
+                ElementType::Circle(mut $c) => { $body_geometry ElementType::Circle($c) },
+                ElementType::Line(mut $c) => { $body_geometry ElementType::Line($c) },
+                ElementType::Path(mut $c) => { $body_geometry ElementType::Path($c) },
+                ElementType::Rect(mut $c) => { $body_geometry ElementType::Rect($c) },
+                ElementType::Group(mut $c) => { $body_group ElementType::Group($c) },
+            }
+        }
+
+        pub fn $func_name_ref( &mut self,  $( $name:$args ), * ) -> &mut Self {
+            match self {
+                ElementType::Circle(ref mut $c) => { $body_geometry self },
+                ElementType::Line(ref mut $c) => { $body_geometry self },
+                ElementType::Path(ref mut $c) => { $body_geometry self },
+                ElementType::Rect(ref mut $c) => { $body_geometry self },
+                ElementType::Group(ref mut $c) => { $body_group self },
+            }
+        }
+    )
+}
+
+#[macro_export]
 macro_rules! impl_basic_style {
     ( $sel:ident, [$func_name:ident, $func_name_ref:ident]( $( $name:ident:$args:ty ), * ) $body:block) => (
         fn $func_name(mut $sel, $( $name:$args ), *) -> Self {

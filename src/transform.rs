@@ -22,7 +22,7 @@ where V: TransformPrimitive + ColorPrimitive + Clone {
         }
     }
 
-    pub fn query(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement)) -> Iter<'_, V> {
+    pub fn query(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement) -> bool) -> Iter<'_, V> {
         Iter::new(self.arena, self.root)
     } 
 }
@@ -40,7 +40,7 @@ where
     V: TransformPrimitive + ColorPrimitive + Clone {
     pub fn new(arena: &'a mut Arena<V>, root: NodeId) -> Self {
         Iter {
-            arena: arena,
+            arena,
             root,
             returned: false
         }
@@ -56,18 +56,17 @@ where V: TransformPrimitive + ColorPrimitive + Clone  {
     }
 }
 
-pub trait Transformer {
-    fn transform(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement));
+pub trait Transformer<V>
+where V: TransformPrimitive + ColorPrimitive + Clone {
+    fn transform(&mut self, f: impl FnOnce(ElementType<V>) -> ElementType<V>);
 }
 
-impl<V: TransformPrimitive + ColorPrimitive + Clone> Transformer for Node<V> {
-    fn transform(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement)) {
-        match &mut self.data {
-            ElementType::Circle(ref mut c) => f(c),
-            ElementType::Line(ref mut c) => f(c),
-            ElementType::Path(ref mut c) => f(c),
-            ElementType::Rect(ref mut c) => f(c),
-            ElementType::Group(ref mut c) => f(c),
-        }
+impl<V: TransformPrimitive + ColorPrimitive + Clone> Transformer<V> for Node<V> {
+    fn transform(&mut self, f: impl FnOnce(ElementType<V>) -> ElementType<V>) {
+        // self.data = f(self.data);
+        take_mut::take(self, |mut s| {
+            s.data = f(s.data);
+            s
+        })
     }
 }

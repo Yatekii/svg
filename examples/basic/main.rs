@@ -156,7 +156,7 @@ fn main() {
         )
         .to_root();
     
-    let extractor = Extractor::new(arena, root);
+    let mut extractor = Extractor::new(arena, root);
     extractor.query(|node| true).map(|node| node.transform(|node| node.transform(Matrix::new_scaling(3.0))));
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
