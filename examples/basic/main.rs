@@ -26,7 +26,7 @@ use glutin::GlContext;
 
 // use std::time::Instant;
 
-use render::{
+use crate::render::{
     fill_pipeline, ColorFormat, DepthFormat, Scene
 };
 
@@ -157,7 +157,7 @@ fn main() {
         .to_root();
     
     let mut extractor = Extractor::new(arena, root);
-    extractor.query(|node| true).map(|node| node.transform(|node| node.transform(Matrix::new_scaling(3.0))));
+    extractor.query(|_node| true).map(|node| node.transform(|node| node.transform(Matrix::new_scaling(3.0))));
 
     // let a = arena.new_node(ElementType::Group(element::Group { transform: Matrix::new_scaling(3.0) }));
     // let b = arena.new_node(ElementType::Circle(builder.circle().center(Point::new(0.0, 0.0)).radius(1.0).finalize()));

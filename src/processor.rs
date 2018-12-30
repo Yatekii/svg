@@ -4,14 +4,14 @@ use std;
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
 
-use geometry::Matrix;
-use color::Color;
-use element::ElementUpdate;
-use attribute_stack::*;
-use common::*;
-use element::ElementType;
-use vertex_data::Buffers;
-use primitive::*;
+use crate::geometry::Matrix;
+use crate::color::Color;
+use crate::element::ElementUpdate;
+use crate::attribute_stack::*;
+use crate::common::*;
+use crate::element::ElementType;
+use crate::vertex_data::Buffers;
+use crate::primitive::*;
 
 
 pub fn process_tree<V, Ctor>(ctor: Ctor, mut attribute_stack: AttributeStack, arena: &mut Arena<V>, node_id: NodeId)

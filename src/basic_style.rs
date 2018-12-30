@@ -1,5 +1,5 @@
-use geometry::Matrix;
-use color::Color;
+use crate::geometry::Matrix;
+use crate::color::Color;
 
 pub trait BasicStylableElement {
     fn fill(self, fill: Color) -> Self where Self: Sized;
@@ -55,9 +55,9 @@ macro_rules! impl_basic_style {
 #[macro_export]
 macro_rules! impl_basic_styles_for_struct {
     ($struct:ident) => {
-        use geometry::Matrix;
-        use color::Color;
-        use basic_style::BasicStylableElement;
+        use crate::geometry::Matrix;
+        use crate::color::Color;
+        use crate::basic_style::BasicStylableElement;
         impl<V> BasicStylableElement for $struct<V>
         where
             V: TransformPrimitive + ColorPrimitive + Clone

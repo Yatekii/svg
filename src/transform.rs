@@ -1,10 +1,10 @@
-use basic_style::BasicStylableElement;
-use common::Node;
-use common::Arena;
-use common::NodeId;
-use primitive::TransformPrimitive;
-use primitive::ColorPrimitive;
-use element::ElementType;
+use crate::basic_style::BasicStylableElement;
+use crate::common::Node;
+use crate::common::Arena;
+use crate::common::NodeId;
+use crate::primitive::TransformPrimitive;
+use crate::primitive::ColorPrimitive;
+use crate::element::ElementType;
 
 pub struct Extractor<'a, V>
 where
@@ -22,7 +22,7 @@ where V: TransformPrimitive + ColorPrimitive + Clone {
         }
     }
 
-    pub fn query(&mut self, f: impl FnOnce(&mut dyn BasicStylableElement) -> bool) -> Iter<'_, V> {
+    pub fn query(&mut self, _f: impl FnOnce(&mut dyn BasicStylableElement) -> bool) -> Iter<'_, V> {
         Iter::new(self.arena, self.root)
     } 
 }

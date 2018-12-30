@@ -3,11 +3,11 @@ use lyon::tessellation::{ StrokeVertex, FillVertex, StrokeOptions, FillOptions, 
 use lyon::tessellation::geometry_builder::{VertexBuffers, BuffersBuilder};
 use lyon::math as lmath;
 
-use geometry::{ Point };
-use primitive::*;
+use crate::geometry::{ Point };
+use crate::primitive::*;
 use super::{ ElementType, ElementUpdate };
 
-use vertex_data::VertexData;
+use crate::vertex_data::VertexData;
 
 #[derive(Debug)]
 pub struct Circle<V: TransformPrimitive + ColorPrimitive + Clone> {

@@ -4,7 +4,7 @@ pub mod path;
 pub mod rect;
 pub mod group;
 
-use vertex_data::VertexData;
+use crate::vertex_data::VertexData;
 pub use self::circle::Circle;
 pub use self::line::Line;
 pub use self::path::Path;
@@ -12,7 +12,7 @@ pub use self::rect::Rect;
 pub use self::group::Group;
 use lyon::tessellation::{ StrokeVertex, FillVertex, VertexConstructor };
 
-use primitive::*;
+use crate::primitive::*;
 
 #[derive(Debug)]
 pub enum ElementType<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -71,9 +71,9 @@ where
     fn tesselate<Ctor>(&mut self, ctor: Ctor) where Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy;
 }
 
-use geometry::Matrix;
-use color::Color;
-use basic_style::BasicStylableElement;
+use crate::geometry::Matrix;
+use crate::color::Color;
+use crate::basic_style::BasicStylableElement;
 impl<V> ElementType<V>
 where
     V: TransformPrimitive + ColorPrimitive + Clone

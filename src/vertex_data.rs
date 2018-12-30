@@ -1,11 +1,11 @@
-use geometry::*;
+use crate::geometry::*;
 use super::color::Color;
-use primitive::*;
+use crate::primitive::*;
 use std;
 
 use gfx;
 use lyon::tessellation::geometry_builder::{ VertexBuffers };
-use transform_data::TransformData;
+use crate::transform_data::TransformData;
 
 pub type ColorFormat = gfx::format::Rgba8;
 

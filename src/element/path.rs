@@ -2,11 +2,11 @@ use lyon::lyon_tessellation::StrokeVertex;
 use lyon::lyon_tessellation::VertexBuffers;
 use lyon::lyon_tessellation::FillVertex;
 use lyon::lyon_tessellation::VertexConstructor;
-use element::ElementUpdate;
-use transform_data::TransformData;
-use vertex_data::VertexData;
-use geometry::{ Point };
-use primitive::*;
+use crate::element::ElementUpdate;
+use crate::transform_data::TransformData;
+use crate::vertex_data::VertexData;
+use crate::geometry::{ Point };
+use crate::primitive::*;
 
 #[derive(Debug)]
 pub struct Path<V: TransformPrimitive + ColorPrimitive + Clone> {
@@ -28,7 +28,7 @@ where
 
     fn make_dirty(&mut self) { self.vertex_data.make_dirty() }
 
-    fn tesselate<Ctor>(&mut self, ctor: Ctor)
+    fn tesselate<Ctor>(&mut self, _ctor: Ctor)
     where
         Ctor: VertexConstructor<FillVertex, V> + VertexConstructor<StrokeVertex, V> + Copy
     {

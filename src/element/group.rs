@@ -1,8 +1,8 @@
-use basic_style::BasicStylableElement;
-use geometry;
-use common::*;
-use primitive::*;
-use element::*;
+use crate::basic_style::BasicStylableElement;
+use crate::geometry;
+use crate::common::*;
+use crate::primitive::*;
+use crate::element::*;
 
 #[derive(Debug)]
 pub struct Group {

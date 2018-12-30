@@ -1,5 +1,5 @@
-use geometry::*;
-use color::*;
+use crate::geometry::*;
+use crate::color::*;
 
 #[derive(Clone)]
 pub struct AttributeStack {
